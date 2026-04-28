@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Figtree:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --paper:#F9F6F0;--paper2:#FDFAF5;--charcoal:#2C2C2C;--brass:#C7A45B;--brass-light:#E8D5A3;--brass-dark:#8B6914;
+    --brown:#3A3A3A;--sepia:#7A6B55;--muted:#9E8E7A;--terracotta:#C07850;--olive:#6B7A4A;
+    --serif:'Cormorant Garamond',Georgia,serif;--sans:'Figtree',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+    --ease:cubic-bezier(0.25,0.46,0.45,0.94);--slow:0.5s;--med:0.35s;--fast:0.2s;
+  }
+  body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+  
+  /* HEADER */
+  .header{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;background:rgba(249,246,240,0.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(199,164,91,0.15);transition:all var(--slow) var(--ease)}
+  .logo{font-family:var(--serif);font-size:1.5rem;font-weight:300;letter-spacing:0.12em;color:var(--charcoal);text-transform:uppercase}
+  .logo span{color:var(--brass)}
+  .nav{display:flex;gap:2rem;list-style:none}
+  .nav a{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--sepia);text-decoration:none;transition:color var(--fast);cursor:pointer}
+  .nav a:hover,.nav a.active{color:var(--brass)}
+  .nav-dot{width:4px;height:4px;background:var(--brass);border-radius:50%;display:inline-block;margin-left:6px;opacity:0;transition:opacity var(--fast)}
+  .nav a.active .nav-dot{opacity:1}
+
+  /* FLOATING SKETCHBOOK */
+  .sketchbook-btn{position:fixed;bottom:2rem;right:2rem;z-index:200;width:52px;height:52px;background:var(--charcoal);border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform var(--med) var(--ease),background var(--fast)}
+  .sketchbook-btn:hover{transform:scale(1.1);background:var(--brass-dark)}
+  .sketchbook-icon{width:22px;height:22px;fill:var(--paper)}
+
+  /* PAGES */
+  .page{display:none;min-height:100vh;padding-top:72px;animation:fadeUp var(--slow) var(--ease)}
+  .page.active{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ZONE 0 – LANDING */
+  .hero{min-height:calc(100vh - 72px);display:grid;place-items:center;position:relative;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 40%,rgba(199,164,91,0.08) 0%,transparent 70%)}
+  .hero-content{text-align:center;z-index:1;padding:2rem}
+  .hero-eyebrow{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--brass);margin-bottom:1.5rem}
+  .hero-title{font-family:var(--serif);font-size:clamp(3rem,7vw,6rem);font-weight:300;line-height:1.05;color:var(--charcoal);margin-bottom:1.5rem;letter-spacing:-0.01em}
+  .hero-title em{font-style:italic;color:var(--brass)}
+  .hero-sub{font-size:1rem;color:var(--sepia);max-width:480px;margin:0 auto 3rem;font-weight:300;line-height:1.7}
+  .hero-sketch{width:min(420px,90vw);margin:0 auto 3rem;opacity:0.85}
+  .btn-row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+  .btn-primary{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;padding:1rem 2.5rem;background:var(--charcoal);color:var(--paper);border:none;cursor:pointer;transition:all var(--med) var(--ease)}
+  .btn-primary:hover{background:var(--brass-dark);letter-spacing:0.18em}
+  .btn-ghost{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;padding:1rem 2.5rem;background:transparent;color:var(--charcoal);border:1px solid rgba(44,44,44,0.3);cursor:pointer;transition:all var(--med) var(--ease)}
+  .btn-ghost:hover{border-color:var(--brass);color:var(--brass)}
+
+  /* HERO SVG SKETCH */
+  .sketch-anim path{stroke-dasharray:1000;stroke-dashoffset:1000;animation:drawLine 3s var(--ease) forwards}
+  .sketch-anim path:nth-child(1){animation-delay:0.2s}
+  .sketch-anim path:nth-child(2){animation-delay:0.6s}
+  .sketch-anim path:nth-child(3){animation-delay:1s}
+  .sketch-anim path:nth-child(4){animation-delay:1.4s}
+  .sketch-anim path:nth-child(5){animation-delay:1.8s}
+  .sketch-anim path:nth-child(6){animation-delay:2.2s}
+  @keyframes drawLine{to{stroke-dashoffset:0}}
+
+  /* ZONE 1 – MODEL SELECTION */
+  .zone-header{padding:4rem 2.5rem 2rem;text-align:center}
+  .zone-eyebrow{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem}
+  .zone-title{font-family:var(--serif);font-size:clamp(2rem,4vw,3.5rem);font-weight:300;color:var(--charcoal);margin-bottom:0.75rem}
+  .zone-sub{color:var(--sepia);font-weight:300;max-width:520px;margin:0 auto}
+  .models-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1.5rem;padding:2rem 2.5rem 4rem;max-width:1100px;margin:0 auto}
+  .model-card{cursor:pointer;transition:transform var(--med) var(--ease);position:relative;text-align:center}
+  .model-card:hover{transform:scale(1.04) translateY(-4px)}
+  .model-sketch{width:100%;aspect-ratio:1;background:var(--paper2);border:1px solid rgba(199,164,91,0.2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:border-color var(--fast),box-shadow var(--med)}
+  .model-card:hover .model-sketch{border-color:var(--brass);box-shadow:0 8px 32px rgba(199,164,91,0.15)}
+  .model-label{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;margin-top:0.75rem;color:var(--sepia);transition:color var(--fast)}
+  .model-card:hover .model-label{color:var(--brass)}
+  .model-tag{font-family:var(--mono);font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:0.2rem}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(44,44,44,0.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;animation:fadeIn var(--med) var(--ease) forwards}
+  @keyframes fadeIn{to{opacity:1}}
+  .modal{background:var(--paper2);max-width:480px;width:100%;padding:3rem;position:relative;animation:slideUp var(--slow) var(--ease) forwards;transform:translateY(20px)}
+  @keyframes slideUp{to{transform:translateY(0)}}
+  .modal-close{position:absolute;top:1.2rem;right:1.2rem;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--muted);line-height:1}
+  .modal-title{font-family:var(--serif);font-size:1.6rem;font-weight:300;margin-bottom:0.5rem;color:var(--charcoal)}
+  .modal-sub{font-size:0.85rem;color:var(--sepia);margin-bottom:2rem;font-weight:300}
+  .modal-options{display:flex;flex-direction:column;gap:0.75rem}
+  .modal-opt{padding:1rem 1.25rem;border:1px solid rgba(44,44,44,0.15);background:transparent;cursor:pointer;text-align:left;transition:all var(--fast);display:flex;align-items:center;gap:0.75rem;font-family:var(--sans)}
+  .modal-opt:hover{border-color:var(--brass);background:rgba(199,164,91,0.05)}
+  .modal-opt-icon{font-size:1.2rem;flex-shrink:0}
+  .modal-opt-label{font-size:0.9rem;font-weight:500;color:var(--charcoal)}
+  .modal-opt-desc{font-size:0.78rem;color:var(--sepia);margin-top:0.15rem;font-weight:300}
+
+  /* ZONE 2 – VIBE */
+  .vibe-grid{display:grid;grid-template-columns:1fr 1fr;max-width:900px;margin:0 auto;padding:2rem 2.5rem 4rem;gap:1px;background:rgba(199,164,91,0.15)}
+  .vibe-row{display:contents}
+  .vibe-card{background:var(--paper2);padding:2.5rem 2rem;cursor:pointer;transition:all var(--med) var(--ease);position:relative;overflow:hidden}
+  .vibe-card::after{content:'';position:absolute;inset:0;background:var(--brass);opacity:0;transition:opacity var(--fast)}
+  .vibe-card:hover::after,.vibe-card.selected::after{opacity:0.06}
+  .vibe-card.selected{border:2px solid var(--brass)}
+  .vibe-name{font-family:var(--serif);font-size:1.6rem;font-weight:300;color:var(--charcoal);margin-bottom:0.4rem}
+  .vibe-desc{font-size:0.8rem;color:var(--sepia);font-weight:300;font-style:italic}
+  .vibe-divider{background:rgba(199,164,91,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.6rem;letter-spacing:0.15em;color:var(--muted);text-transform:uppercase;writing-mode:vertical-rl;text-orientation:mixed;padding:0;min-width:40px}
+  .vibe-sep{grid-column:1/-1;background:rgba(199,164,91,0.2);height:1px}
+  .vibe-actions{max-width:900px;margin:0 auto;padding:0 2.5rem 4rem;display:flex;gap:1rem;flex-wrap:wrap}
+
+  /* ZONE 3 – MOOD BOARD */
+  .moodboard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;padding:2rem 2.5rem;max-width:1000px;margin:0 auto}
+  .mb-card{cursor:pointer;position:relative;overflow:hidden;aspect-ratio:4/3;transition:transform var(--med) var(--ease)}
+  .mb-card:hover{transform:scale(1.03)}
+  .mb-img{width:100%;height:100%;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:3rem;background:var(--paper2);border:1px solid rgba(199,164,91,0.2)}
+  .mb-label{position:absolute;bottom:0;left:0;right:0;background:rgba(44,44,44,0.7);color:var(--paper);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.5rem 0.75rem}
+  .mb-value{font-family:var(--serif);font-size:0.85rem;font-style:italic;color:var(--brass-light)}
+  .mb-tooltip{position:absolute;top:0.5rem;right:0.5rem;background:rgba(199,164,91,0.9);color:var(--charcoal);font-family:var(--mono);font-size:0.55rem;padding:0.2rem 0.5rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0;transition:opacity var(--fast)}
+  .mb-card:hover .mb-tooltip{opacity:1}
+  .mb-actions{max-width:1000px;margin:0 auto;padding:0 2.5rem 4rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+
+  /* ZONE 4 – MANUAL */
+  .manual-layout{display:grid;grid-template-columns:1fr 1fr;gap:3rem;max-width:1100px;margin:0 auto;padding:2rem 2.5rem 4rem}
+  .param-block{margin-bottom:2rem}
+  .param-label{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem}
+  .param-options{display:flex;gap:0.5rem;flex-wrap:wrap}
+  .param-opt{padding:0.4rem 0.9rem;border:1px solid rgba(44,44,44,0.15);background:transparent;cursor:pointer;font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;transition:all var(--fast);color:var(--sepia)}
+  .param-opt:hover,.param-opt.sel{border-color:var(--brass);color:var(--charcoal);background:rgba(199,164,91,0.08)}
+  .preview-box{background:var(--paper2);border:1px solid rgba(199,164,91,0.2);border-radius:0;aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:sticky;top:90px}
+
+  /* ZONE 5 – COMPOSITION */
+  .composition-wrap{max-width:900px;margin:0 auto;padding:4rem 2.5rem}
+  .comp-header{text-align:center;margin-bottom:3rem}
+  .comp-canvas{position:relative;display:grid;place-items:center}
+  .comp-img{width:100%;max-width:600px;display:block;margin:0 auto}
+  .comp-footer{text-align:center;margin-top:3rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+  /* ZONE 6 – 3D */
+  .zone6-layout{display:grid;grid-template-columns:1fr 1fr;gap:3rem;max-width:1200px;margin:0 auto;padding:2rem 2.5rem 4rem;min-height:calc(100vh - 200px)}
+  .model3d-area{background:var(--paper2);border:1px solid rgba(199,164,91,0.2);position:relative;display:flex;align-items:center;justify-content:center;min-height:480px;cursor:crosshair}
+  .model3d-hint{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);text-align:center}
+  .part-highlight{position:absolute;background:rgba(199,164,91,0.15);border:1px solid rgba(199,164,91,0.5);padding:0.5rem 0.75rem;cursor:pointer;font-family:var(--mono);font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--charcoal);transition:all var(--fast)}
+  .part-highlight:hover{background:rgba(199,164,91,0.3);border-color:var(--brass)}
+  .part-panel{background:var(--paper2);border:1px solid rgba(199,164,91,0.15);padding:2rem;display:flex;flex-direction:column;gap:1.5rem}
+  .part-panel-empty{display:flex;align-items:center;justify-content:center;min-height:200px;border:1px dashed rgba(199,164,91,0.2)}
+  .part-name{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:var(--charcoal)}
+  .part-meta{font-size:0.8rem;color:var(--sepia);font-weight:300}
+  .part-value{display:flex;gap:0.5rem;flex-wrap:wrap}
+  .part-tag{padding:0.3rem 0.7rem;background:rgba(199,164,91,0.12);border:1px solid rgba(199,164,91,0.3);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--brass-dark)}
+  .zone6-bottom{grid-column:1/-1;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;padding-top:1rem;border-top:1px solid rgba(199,164,91,0.15)}
+
+  /* ZONE 7 – AR */
+  .ar-layout{max-width:700px;margin:0 auto;padding:2rem 2.5rem 4rem}
+  .ar-tabs{display:flex;border-bottom:1px solid rgba(199,164,91,0.2);margin-bottom:2rem}
+  .ar-tab{padding:0.75rem 1.5rem;cursor:pointer;font-family:var(--mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;transition:all var(--fast);background:none;border-top:none;border-left:none;border-right:none}
+  .ar-tab.active{color:var(--charcoal);border-bottom-color:var(--brass)}
+  .ar-camera{background:var(--charcoal);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;margin-bottom:2rem;position:relative;overflow:hidden}
+  .ar-camera-hint{color:var(--paper);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;text-align:center;opacity:0.7}
+  .ar-ring{position:absolute;width:200px;height:200px;border:2px solid rgba(199,164,91,0.6);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.05);opacity:1}}
+  .dim-form{display:flex;flex-direction:column;gap:1.5rem}
+  .dim-group{display:flex;flex-direction:column;gap:0.5rem}
+  .dim-label{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+  .dim-input{padding:0.75rem 1rem;border:1px solid rgba(44,44,44,0.15);background:var(--paper2);font-family:var(--sans);font-size:0.9rem;color:var(--charcoal);transition:border-color var(--fast);outline:none}
+  .dim-input:focus{border-color:var(--brass)}
+
+  /* ZONE 8 – SET BUILDER */
+  .set-layout{max-width:1100px;margin:0 auto;padding:2rem 2.5rem 4rem}
+  .set-header-card{background:rgba(199,164,91,0.08);border:1px solid rgba(199,164,91,0.2);padding:1.5rem;margin-bottom:3rem;display:flex;align-items:center;gap:1.5rem}
+  .set-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
+  .set-current{background:var(--paper2);border:1px solid rgba(199,164,91,0.15);padding:2rem}
+  .set-builder-area{display:flex;flex-direction:column;gap:1.5rem}
+  .set-item-card{background:var(--paper2);border:1px solid rgba(44,44,44,0.1);padding:1.25rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:border-color var(--fast)}
+  .set-item-card:hover{border-color:var(--brass)}
+  .set-item-sketch{width:60px;height:60px;background:var(--paper);border:1px solid rgba(199,164,91,0.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+  .set-item-info{flex:1}
+  .set-item-name{font-family:var(--serif);font-size:1rem;color:var(--charcoal)}
+  .set-item-desc{font-size:0.78rem;color:var(--sepia);font-weight:300}
+  .add-btn{padding:0.4rem 0.8rem;border:1px solid var(--brass);background:transparent;color:var(--brass-dark);font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all var(--fast)}
+  .add-btn:hover{background:var(--brass);color:var(--paper)}
+
+  /* ZONE 9 – CHECKOUT */
+  .checkout-layout{max-width:700px;margin:0 auto;padding:2rem 2.5rem 4rem}
+  .checkout-section{margin-bottom:2.5rem}
+  .checkout-label{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid rgba(199,164,91,0.15)}
+  .checkout-input{width:100%;padding:0.75rem 1rem;border:1px solid rgba(44,44,44,0.15);background:var(--paper2);font-family:var(--sans);font-size:0.9rem;color:var(--charcoal);margin-bottom:1rem;outline:none;transition:border-color var(--fast)}
+  .checkout-input:focus{border-color:var(--brass)}
+  .checkout-check{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;cursor:pointer}
+  .checkout-check input{margin-top:0.15rem;accent-color:var(--brass)}
+  .checkout-check-text{font-size:0.85rem;color:var(--sepia);font-weight:300}
+  .checkout-summary{background:var(--paper2);border:1px solid rgba(199,164,91,0.15);padding:1.5rem;margin-bottom:2rem}
+  .checkout-row{display:flex;justify-content:space-between;font-size:0.85rem;color:var(--sepia);margin-bottom:0.5rem}
+  .checkout-total{display:flex;justify-content:space-between;font-family:var(--serif);font-size:1.2rem;color:var(--charcoal);padding-top:1rem;border-top:1px solid rgba(199,164,91,0.2);margin-top:0.5rem}
+
+  /* ZONE 10 – GALLERY */
+  .gallery-filters{padding:1.5rem 2.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;border-bottom:1px solid rgba(199,164,91,0.15)}
+  .filter-btn{padding:0.4rem 1rem;border:1px solid rgba(44,44,44,0.15);background:transparent;cursor:pointer;font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;transition:all var(--fast);color:var(--sepia)}
+  .filter-btn:hover,.filter-btn.active{border-color:var(--brass);color:var(--charcoal);background:rgba(199,164,91,0.08)}
+  .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;padding:2rem 2.5rem 4rem}
+  .gallery-card{cursor:pointer;transition:transform var(--med) var(--ease);position:relative}
+  .gallery-card:hover{transform:translateY(-6px)}
+  .gallery-mb{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:0;aspect-ratio:3/1;overflow:hidden}
+  .gallery-mb-img{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--paper2)}
+  .gallery-photo{aspect-ratio:4/3;background:var(--charcoal);display:flex;align-items:center;justify-content:center;position:relative}
+  .gallery-photo-inner{font-size:3rem}
+  .gallery-info{padding:1rem;background:var(--paper2);border:1px solid rgba(199,164,91,0.1);border-top:none}
+  .gallery-vibe{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--brass-dark);margin-bottom:0.4rem}
+  .gallery-review{font-size:0.8rem;color:var(--sepia);font-style:italic;font-weight:300}
+  .gallery-use-btn{position:absolute;top:0.75rem;right:0.75rem;background:var(--charcoal);color:var(--paper);padding:0.4rem 0.75rem;font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;opacity:0;transition:opacity var(--fast);cursor:pointer;border:none}
+  .gallery-card:hover .gallery-use-btn{opacity:1}
+
+  /* BREADCRUMB / PROGRESS */
+  .progress-bar{display:flex;align-items:center;gap:0;padding:1rem 2.5rem 0;max-width:1100px;margin:0 auto;flex-wrap:wrap;gap:0.5rem}
+  .progress-step{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color var(--fast)}
+  .progress-step.done{color:var(--brass-dark)}
+  .progress-step.current{color:var(--charcoal)}
+  .progress-arrow{color:var(--muted);margin:0 0.25rem;font-size:0.6rem}
+
+  /* LIGHTBOX */
+  .lightbox-overlay{position:fixed;inset:0;background:rgba(44,44,44,0.75);z-index:400;display:flex;align-items:center;justify-content:center;padding:1.5rem;animation:fadeIn var(--fast) var(--ease)}
+  .lightbox{background:var(--paper2);max-width:600px;width:100%;padding:2.5rem;position:relative}
+  .lightbox-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin:1.5rem 0}
+  .lb-img{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--paper);border:1px solid rgba(199,164,91,0.15);cursor:pointer;transition:all var(--fast)}
+  .lb-img:hover,.lb-img.selected{border-color:var(--brass);background:rgba(199,164,91,0.06)}
+  .lightbox-actions{display:flex;gap:0.75rem;flex-wrap:wrap}
+
+  /* DESIGN HISTORY SIDEBAR */
+  .sidebar{position:fixed;top:0;right:0;bottom:0;width:320px;background:var(--paper2);border-left:1px solid rgba(199,164,91,0.2);z-index:250;transform:translateX(100%);transition:transform var(--slow) var(--ease);padding:5rem 1.5rem 2rem;overflow-y:auto}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-title{font-family:var(--serif);font-size:1.2rem;font-weight:300;margin-bottom:1.5rem;color:var(--charcoal)}
+  .sidebar-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--muted)}
+  .history-item{padding:0.75rem;border:1px solid rgba(199,164,91,0.15);margin-bottom:0.75rem;cursor:pointer;transition:border-color var(--fast)}
+  .history-item:hover{border-color:var(--brass)}
+  .history-label{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+  .history-val{font-size:0.85rem;color:var(--charcoal);margin-top:0.2rem}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:var(--charcoal);color:var(--paper);padding:0.75rem 1.5rem;font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;z-index:500;animation:toastIn 0.3s var(--ease),toastOut 0.3s var(--ease) 2.7s forwards}
+  @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  @keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(10px)}}
+
+  /* FOOTER */
+  .footer{background:var(--charcoal);color:rgba(249,246,240,0.6);padding:3rem 2.5rem;margin-top:4rem}
+  .footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;max-width:1100px;margin:0 auto}
+  .footer-brand{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--paper);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.75rem}
+  .footer-brand span{color:var(--brass)}
+  .footer-text{font-size:0.8rem;line-height:1.7;font-weight:300}
+  .footer-col-title{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--brass);margin-bottom:0.75rem}
+  .footer-links{list-style:none;display:flex;flex-direction:column;gap:0.4rem}
+  .footer-links li{font-size:0.8rem;cursor:pointer;transition:color var(--fast)}
+  .footer-links li:hover{color:var(--paper)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="logo">Au<span>·</span>lieu</div>
+  <nav><ul class="nav" id="main-nav">
+    <li><a onclick="goTo('zone1')" id="nav-design">Design<span class="nav-dot"></span></a></li>
+    <li><a onclick="goTo('zone10')" id="nav-gallery">Gallery<span class="nav-dot"></span></a></li>
+    <li><a style="opacity:0.4;cursor:default">Collaborate</a></li>
+    <li><a onclick="openSidebar()" id="nav-account">Account</a></li>
+  </ul></nav>
+</header>
+
+<!-- SKETCHBOOK BUTTON -->
+<button class="sketchbook-btn" onclick="openSidebar()" aria-label="Open sketchbook">
+  <svg class="sketchbook-icon" viewBox="0 0 24 24"><path d="M2 4h16v16H2z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 4V2M6 20v2M18 4h2a2 2 0 012 2v12a2 2 0 01-2 2h-2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6 8h8M6 12h8M6 16h5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+</button>
+
+<!-- DESIGN HISTORY SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  <div class="sidebar-title">Your Sketchbook</div>
+  <div id="history-list"></div>
+  <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid rgba(199,164,91,0.15)">
+    <div class="footer-col-title" style="margin-bottom:0.75rem">Saved Templates</div>
+    <div style="font-size:0.8rem;color:var(--sepia);font-style:italic;font-weight:300">No saved templates yet. Approve a mood board to save it.</div>
+  </div>
+</aside>
+
+<!-- PAGES -->
+
+<!-- ZONE 0: LANDING -->
+<div class="page active" id="zone0">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Atelier-crafted accessories</div>
+      <h1 class="hero-title">Design something<br><em>entirely yours</em></h1>
+      <p class="hero-sub">From a mood to a piece of jewellery — we sketch it, you shape it, we craft it.</p>
+      
+      <div class="hero-sketch">
+        <svg viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg" class="sketch-anim">
+          <path d="M200 60 C160 60 130 90 130 130 C130 170 160 200 200 200 C240 200 270 170 270 130 C270 90 240 60 200 60Z" fill="none" stroke="#C7A45B" stroke-width="1.5" opacity="0.8"/>
+          <path d="M200 80 C172 80 150 102 150 130 C150 158 172 180 200 180 C228 180 250 158 250 130 C250 102 228 80 200 80Z" fill="none" stroke="#3A3A3A" stroke-width="0.8" opacity="0.5"/>
+          <path d="M175 130 C175 116 187 105 200 105 C213 105 225 116 225 130 C225 144 213 155 200 155 C187 155 175 144 175 130Z" fill="none" stroke="#C7A45B" stroke-width="1" opacity="0.7"/>
+          <path d="M185 115 L215 145 M215 115 L185 145" stroke="#3A3A3A" stroke-width="0.6" opacity="0.3"/>
+          <path d="M80 40 L100 60 M100 40 L80 60" stroke="#7A6B55" stroke-width="0.8" opacity="0.4"/>
+          <path d="M300 200 C290 190 285 195 295 205 C305 215 300 220 290 210" fill="none" stroke="#7A6B55" stroke-width="0.8" opacity="0.4"/>
+          <path d="M60 200 L140 200 M100 160 L100 240" stroke="#C7A45B" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.3"/>
+          <text x="62" y="255" font-family="JetBrains Mono" font-size="8" fill="#7A6B55" letter-spacing="2" opacity="0.6">PENDANT — SCALE 1:1</text>
+          <path d="M120 260 L280 260" stroke="#7A6B55" stroke-width="0.5" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="goTo('zone1')">Start a new design</button>
+        <button class="btn-ghost" onclick="goTo('zone10')">Explore gallery</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEASER -->
+  <section style="padding:4rem 2.5rem;max-width:1100px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:3rem">
+      <div class="zone-eyebrow">From our atelier</div>
+      <h2 style="font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--charcoal)">Recent creations</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem">
+      <div class="gallery-card" onclick="goTo('zone10')">
+        <div class="gallery-mb"><div class="gallery-mb-img">🌿</div><div class="gallery-mb-img">⬡</div><div class="gallery-mb-img">🪨</div></div>
+        <div class="gallery-photo"><div class="gallery-photo-inner">💍</div></div>
+        <div class="gallery-info"><div class="gallery-vibe">Organic / Flowing · Ring</div><div class="gallery-review">"Exactly the mood I had in my head — translated perfectly."</div></div>
+        <button class="gallery-use-btn" onclick="event.stopPropagation();loadMoodBoard('organic')">Use this board</button>
+      </div>
+      <div class="gallery-card" onclick="goTo('zone10')">
+        <div class="gallery-mb"><div class="gallery-mb-img">🔷</div><div class="gallery-mb-img">✦</div><div class="gallery-mb-img">🫧</div></div>
+        <div class="gallery-photo"><div class="gallery-photo-inner">📿</div></div>
+        <div class="gallery-info"><div class="gallery-vibe">Geometric / Structured · Necklace</div><div class="gallery-review">"The 3D preview was so close to the final piece."</div></div>
+        <button class="gallery-use-btn" onclick="event.stopPropagation();loadMoodBoard('geometric')">Use this board</button>
+      </div>
+      <div class="gallery-card" onclick="goTo('zone10')">
+        <div class="gallery-mb"><div class="gallery-mb-img">🌸</div><div class="gallery-mb-img">🍃</div><div class="gallery-mb-img">🌙</div></div>
+        <div class="gallery-photo"><div class="gallery-photo-inner">💎</div></div>
+        <div class="gallery-info"><div class="gallery-vibe">Soft / Delicate · Earrings</div><div class="gallery-review">"Delicate exactly as I imagined. Worth every step."</div></div>
+        <button class="gallery-use-btn" onclick="event.stopPropagation();loadMoodBoard('delicate')">Use this board</button>
+      </div>
+    </div>
+  </section>
+  <footer class="footer">
+    <div class="footer-grid">
+      <div><div class="footer-brand">Au<span>·</span>lieu</div><div class="footer-text">Bespoke accessories, made one at a time. Each piece begins with your vision and ends with a craftsperson's hands.</div></div>
+      <div><div class="footer-col-title">Process</div><ul class="footer-links"><li>How it works</li><li>Materials</li><li>Sustainability</li><li>Production timeline</li></ul></div>
+      <div><div class="footer-col-title">Studio</div><ul class="footer-links"><li>About us</li><li>Collaborators</li><li>Press</li><li>Contact</li></ul></div>
+      <div><div class="footer-col-title">Stay in touch</div><input class="dim-input" style="width:100%;margin-bottom:0.75rem;font-size:0.8rem" placeholder="Your email"><button class="btn-ghost" style="width:100%;font-size:0.6rem;padding:0.6rem">Subscribe →</button></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ZONE 1: MODEL SELECTION -->
+<div class="page" id="zone1">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Step 1 of 7</div>
+    <h1 class="zone-title">What would you like to design?</h1>
+    <p class="zone-sub">Each piece begins as a sketch. Choose the form, and we'll build your design language together.</p>
+  </div>
+  <div class="models-grid" id="models-grid"></div>
+</div>
+
+<!-- ZONE 2: VIBE -->
+<div class="page" id="zone2">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Step 2 of 7</div>
+    <h1 class="zone-title">What's the feeling?</h1>
+    <p class="zone-sub">Choose one side of each pair. This shapes your mood board — you can always refine later.</p>
+  </div>
+  <div id="vibe-content"></div>
+</div>
+
+<!-- ZONE 3: MOOD BOARD -->
+<div class="page" id="zone3">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Step 3 of 7</div>
+    <h1 class="zone-title">Your design language</h1>
+    <p class="zone-sub">We've sketched a mood board based on your vibe. Tap any image to swap it — or approve and continue.</p>
+  </div>
+  <div class="moodboard-grid" id="moodboard-grid"></div>
+  <div class="mb-actions">
+    <button class="btn-primary" onclick="goTo('zone5')">Approve mood board →</button>
+    <button class="btn-ghost" onclick="goTo('zone2')">Reset to vibe selection</button>
+    <button class="btn-ghost" onclick="saveMoodBoard()">Save as template</button>
+  </div>
+</div>
+
+<!-- ZONE 4: MANUAL -->
+<div class="page" id="zone4">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Manual Control</div>
+    <h1 class="zone-title">Fine-tune every detail</h1>
+    <p class="zone-sub">Six parameters, full control. The sketch updates as you choose.</p>
+  </div>
+  <div class="manual-layout">
+    <div id="manual-params"></div>
+    <div>
+      <div class="preview-box" id="manual-preview">
+        <div style="text-align:center">
+          <div id="manual-preview-sketch" style="font-size:4rem;margin-bottom:0.5rem">💍</div>
+          <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Live sketch preview</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 2.5rem 4rem;display:flex;gap:1rem;flex-wrap:wrap">
+    <button class="btn-primary" onclick="goTo('zone5')">Save & continue →</button>
+    <button class="btn-ghost" onclick="goTo('zone3')">Load saved mood board</button>
+  </div>
+</div>
+
+<!-- ZONE 5: COMPOSITION -->
+<div class="page" id="zone5">
+  <div class="composition-wrap">
+    <div class="comp-header">
+      <div class="zone-eyebrow">Step 4 of 7</div>
+      <h1 class="zone-title">This is your design language</h1>
+      <p class="zone-sub" style="margin-bottom:0">Scroll down to see your 3D model. Tap any element to edit its parameter.</p>
+    </div>
+    <div class="comp-canvas">
+      <svg class="comp-img" viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg">
+        <rect width="600" height="420" fill="#FDFAF5"/>
+        <!-- Botanical -->
+        <g opacity="0.7">
+          <path d="M80 300 C80 200 120 150 100 80" fill="none" stroke="#6B7A4A" stroke-width="1.5"/>
+          <path d="M100 80 C130 60 160 90 140 120 C120 150 90 140 100 80Z" fill="rgba(107,122,74,0.2)" stroke="#6B7A4A" stroke-width="1"/>
+          <path d="M100 130 C80 110 50 130 70 160 C90 190 110 170 100 130Z" fill="rgba(107,122,74,0.15)" stroke="#6B7A4A" stroke-width="0.8"/>
+          <path d="M100 180 C120 160 150 180 130 210 C110 240 90 220 100 180Z" fill="rgba(107,122,74,0.15)" stroke="#6B7A4A" stroke-width="0.8"/>
+        </g>
+        <!-- Stone texture -->
+        <ellipse cx="300" cy="200" rx="90" ry="70" fill="rgba(122,107,85,0.1)" stroke="#7A6B55" stroke-width="1"/>
+        <ellipse cx="300" cy="200" rx="60" ry="45" fill="rgba(122,107,85,0.08)" stroke="#7A6B55" stroke-width="0.8"/>
+        <path d="M260 180 C270 160 300 150 320 170 C340 190 330 220 310 230 C280 240 255 215 260 180Z" fill="rgba(199,164,91,0.15)" stroke="#C7A45B" stroke-width="1.2"/>
+        <path d="M270 190 L310 210 M280 175 L320 200 M265 205 L305 215" stroke="#7A6B55" stroke-width="0.5" opacity="0.4"/>
+        <!-- Geometric shapes -->
+        <rect x="420" y="80" width="80" height="80" fill="none" stroke="#2C2C2C" stroke-width="1" transform="rotate(15,460,120)"/>
+        <rect x="430" y="90" width="60" height="60" fill="none" stroke="#C7A45B" stroke-width="0.7" transform="rotate(15,460,120)"/>
+        <!-- Chain sketch -->
+        <path d="M150 380 C200 360 250 370 300 355 C350 340 400 355 450 340" fill="none" stroke="#7A6B55" stroke-width="1" stroke-dasharray="8,4"/>
+        <!-- Labels -->
+        <text x="60" y="340" font-family="JetBrains Mono" font-size="7" fill="#9E8E7A" letter-spacing="2">VOLUME — DELICATE</text>
+        <text x="260" y="295" font-family="JetBrains Mono" font-size="7" fill="#9E8E7A" letter-spacing="2">TEXTURE — FACETED</text>
+        <text x="420" y="175" font-family="JetBrains Mono" font-size="7" fill="#9E8E7A" letter-spacing="2">COMPLEXITY — ORNATE</text>
+        <text x="140" y="395" font-family="JetBrains Mono" font-size="7" fill="#9E8E7A" letter-spacing="2">METAL — GOLD</text>
+        <!-- Edit hotspots -->
+        <circle cx="300" cy="200" r="6" fill="rgba(199,164,91,0.6)" style="cursor:pointer" onclick="openLightbox('texture')" title="Edit texture"/>
+        <circle cx="460" cy="120" r="6" fill="rgba(199,164,91,0.6)" style="cursor:pointer" onclick="openLightbox('complexity')" title="Edit complexity"/>
+        <circle cx="90" cy="200" r="6" fill="rgba(199,164,91,0.6)" style="cursor:pointer" onclick="openLightbox('volume')" title="Edit volume"/>
+      </svg>
+    </div>
+    <div class="comp-footer">
+      <button class="btn-primary" onclick="goTo('zone6')">See the 3D model →</button>
+      <button class="btn-ghost" onclick="shareComp()">Share composition</button>
+      <button class="btn-ghost" onclick="goTo('zone3')">Edit mood board</button>
+    </div>
+  </div>
+</div>
+
+<!-- ZONE 6: 3D MODEL -->
+<div class="page" id="zone6">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Step 5 of 7</div>
+    <h1 class="zone-title">Your piece, in three dimensions</h1>
+    <p class="zone-sub">Hover over the model to explore each part. Click to edit individual elements.</p>
+  </div>
+  <div class="zone6-layout">
+    <div class="model3d-area" id="model3d">
+      <svg width="320" height="320" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" style="opacity:0.9">
+        <defs><filter id="sk"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+        <!-- Ring body -->
+        <ellipse cx="160" cy="160" rx="100" ry="60" fill="none" stroke="#C7A45B" stroke-width="2.5" filter="url(#sk)"/>
+        <ellipse cx="160" cy="160" rx="100" ry="60" fill="none" stroke="#C7A45B" stroke-width="1" opacity="0.3" transform="translate(3,3)"/>
+        <ellipse cx="160" cy="140" rx="80" ry="40" fill="rgba(199,164,91,0.06)" stroke="#7A6B55" stroke-width="1" stroke-dasharray="6,3"/>
+        <!-- Band cross-section lines -->
+        <path d="M60 160 Q80 175 100 172 Q120 169 160 168 Q200 167 220 172 Q240 175 260 160" fill="none" stroke="#7A6B55" stroke-width="0.8" opacity="0.6"/>
+        <!-- Stone setting -->
+        <polygon points="160,95 180,120 160,135 140,120" fill="rgba(199,164,91,0.2)" stroke="#C7A45B" stroke-width="1.5"/>
+        <polygon points="160,100 175,122 160,130 145,122" fill="rgba(199,164,91,0.1)" stroke="#7A6B55" stroke-width="0.5"/>
+        <!-- Prongs -->
+        <path d="M148,115 L144,95 M172,115 L176,95 M145,125 L136,140 M175,125 L184,140" stroke="#C7A45B" stroke-width="1.2"/>
+        <!-- Highlight parts -->
+        <ellipse id="part-band" cx="160" cy="185" rx="100" ry="18" fill="transparent" stroke="transparent" stroke-width="8" style="cursor:pointer" onclick="selectPart('band')" onmouseenter="hoverPart('band',true)" onmouseleave="hoverPart('band',false)"/>
+        <polygon id="part-stone" points="160,90 185,125 160,140 135,125" fill="transparent" stroke="transparent" stroke-width="8" style="cursor:pointer" onclick="selectPart('stone')" onmouseenter="hoverPart('stone',true)" onmouseleave="hoverPart('stone',false)"/>
+        <!-- Part labels -->
+        <text x="50" y="195" font-family="JetBrains Mono" font-size="8" fill="#9E8E7A" letter-spacing="1.5">band</text>
+        <path d="M76,190 L110,183" stroke="#9E8E7A" stroke-width="0.5"/>
+        <text x="182" y="88" font-family="JetBrains Mono" font-size="8" fill="#9E8E7A" letter-spacing="1.5">stone</text>
+        <path d="M196,92 L178,108" stroke="#9E8E7A" stroke-width="0.5"/>
+        <!-- Hatch shading -->
+        <path d="M120,160 L140,170 M130,155 L150,165 M140,152 L160,162 M150,150 L170,160 M160,150 L180,160" stroke="#7A6B55" stroke-width="0.4" opacity="0.4"/>
+      </svg>
+      <div style="position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%)">
+        <div class="model3d-hint">Hover parts to explore · Click to edit</div>
+      </div>
+    </div>
+
+    <div id="part-panel-area">
+      <div class="part-panel-empty">
+        <div class="model3d-hint" style="text-align:center;max-width:200px">Hover over a part of the model to see its details</div>
+      </div>
+    </div>
+
+    <div class="zone6-bottom">
+      <button class="btn-primary" onclick="goTo('zone7')">Satisfied — go to AR try-on →</button>
+      <button class="btn-ghost" onclick="goTo('zone3')">Change mood board</button>
+    </div>
+  </div>
+</div>
+
+<!-- ZONE 7: AR / DIMENSIONS -->
+<div class="page" id="zone7">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Step 6 of 7</div>
+    <h1 class="zone-title">Try it on</h1>
+    <p class="zone-sub">See how it sits in real space, or enter your measurements.</p>
+  </div>
+  <div class="ar-layout">
+    <div class="ar-tabs">
+      <button class="ar-tab active" id="tab-ar" onclick="switchARTab('ar')">Try in AR</button>
+      <button class="ar-tab" id="tab-dim" onclick="switchARTab('dim')">Enter dimensions</button>
+    </div>
+    <div id="ar-content">
+      <div class="ar-camera">
+        <div style="text-align:center">
+          <div class="ar-ring"></div>
+          <div class="ar-camera-hint">Point your camera at your hand<br>to place the ring</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap">
+        <button class="btn-ghost" style="flex:1" onclick="goTo('zone6')">Adjust proportions</button>
+        <button class="btn-primary" style="flex:1" onclick="goTo('zone8')">Looks good — proceed →</button>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);font-family:var(--mono);letter-spacing:0.08em;text-align:center">AR requires camera access · Demo mode active</div>
+    </div>
+    <div id="dim-content" style="display:none">
+      <div class="dim-form">
+        <div class="dim-group"><label class="dim-label">Ring size (US)</label><input class="dim-input" placeholder="e.g. 7 or 7.5" id="dim-ring-size"></div>
+        <div class="dim-group"><label class="dim-label">Finger (optional)</label>
+          <select class="dim-input" style="cursor:pointer"><option>Index — left hand</option><option>Middle — left hand</option><option>Ring — left hand</option><option>Pinky — left hand</option><option>Index — right hand</option><option>Ring — right hand</option></select>
+        </div>
+        <div class="dim-group"><label class="dim-label">Preferred band width</label>
+          <div class="param-options"><button class="param-opt sel">Slim (1.5mm)</button><button class="param-opt" onclick="selectParamOpt(this)">Standard (2.5mm)</button><button class="param-opt" onclick="selectParamOpt(this)">Wide (4mm)</button></div>
+        </div>
+      </div>
+      <div style="margin-top:2rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+        <button class="btn-primary" style="flex:1" onclick="goTo('zone8')">Confirm dimensions →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ZONE 8: SET BUILDER -->
+<div class="page" id="zone8">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Step 7 of 7</div>
+    <h1 class="zone-title">Make it a set</h1>
+    <p class="zone-sub">Your mood board is saved. Add matching pieces, or proceed with just this one.</p>
+  </div>
+  <div class="set-layout">
+    <div class="set-header-card">
+      <div style="font-size:2.5rem">📒</div>
+      <div>
+        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.25rem">Saved mood board</div>
+        <div style="font-family:var(--serif);font-size:1.1rem;color:var(--charcoal)">"<span id="moodboard-name">Warm Geometric Study</span>"</div>
+        <div style="font-size:0.78rem;color:var(--sepia);font-weight:300;margin-top:0.2rem">6 parameters locked · Editable at any time</div>
+      </div>
+    </div>
+    <div class="set-grid">
+      <div class="set-current">
+        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">Current piece</div>
+        <div style="font-size:3.5rem;text-align:center;margin-bottom:1rem" id="current-piece-icon">💍</div>
+        <div style="font-family:var(--serif);font-size:1.2rem;text-align:center;margin-bottom:0.5rem" id="current-piece-name">Ring</div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1.5rem" id="current-tags"></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1.5rem">
+          <div style="font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Estimated price</div>
+          <div style="font-family:var(--serif);font-size:1.4rem;color:var(--charcoal)">€ 480</div>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="goTo('zone9')">Order this piece only →</button>
+      </div>
+      <div class="set-builder-area">
+        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Add matching pieces</div>
+        <div id="set-items"></div>
+        <button class="btn-ghost" style="margin-top:1rem" onclick="goTo('zone9')">Add selected to cart →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ZONE 9: CHECKOUT -->
+<div class="page" id="zone9">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Checkout</div>
+    <h1 class="zone-title">Almost there</h1>
+    <p class="zone-sub">Give your piece a name. We'll keep it in your archive forever.</p>
+  </div>
+  <div class="checkout-layout">
+    <div class="checkout-summary">
+      <div style="display:flex;gap:1.5rem;align-items:center;margin-bottom:1.5rem">
+        <div style="font-size:2.5rem" id="checkout-icon">💍</div>
+        <div>
+          <div style="font-family:var(--serif);font-size:1.2rem;color:var(--charcoal)" id="checkout-name">Custom Ring</div>
+          <div style="font-size:0.78rem;color:var(--sepia);font-weight:300">Bespoke · Made to order · 6–8 weeks</div>
+        </div>
+      </div>
+      <div class="checkout-row"><span>Design</span><span>€ 480</span></div>
+      <div class="checkout-row"><span>Production & finishing</span><span>Included</span></div>
+      <div class="checkout-row"><span>Shipping (tracked)</span><span>€ 18</span></div>
+      <div class="checkout-total"><span>Total</span><span>€ 498</span></div>
+    </div>
+    <div class="checkout-section">
+      <div class="checkout-label">Name your design</div>
+      <input class="checkout-input" placeholder="e.g. The Solstice Ring" id="design-name">
+    </div>
+    <div class="checkout-section">
+      <div class="checkout-label">Contact</div>
+      <input class="checkout-input" placeholder="Full name">
+      <input class="checkout-input" placeholder="Email address">
+    </div>
+    <div class="checkout-section">
+      <div class="checkout-label">Shipping address</div>
+      <input class="checkout-input" placeholder="Address line 1">
+      <input class="checkout-input" placeholder="City, Postcode, Country">
+    </div>
+    <div class="checkout-section">
+      <div class="checkout-label">Preferences</div>
+      <label class="checkout-check"><input type="checkbox" checked> <span class="checkout-check-text">Share my mood board and final piece to the Gallery (opt-in)</span></label>
+      <label class="checkout-check"><input type="checkbox"> <span class="checkout-check-text">This is a gift — send to a different address</span></label>
+      <label class="checkout-check"><input type="checkbox"> <span class="checkout-check-text">Keep me updated on production milestones</span></label>
+    </div>
+    <button class="btn-primary" style="width:100%;padding:1.2rem;font-size:0.75rem" onclick="placeOrder()">Place order →</button>
+    <div style="margin-top:1rem;font-size:0.75rem;color:var(--muted);text-align:center;font-family:var(--mono);letter-spacing:0.08em">No card charged until your design is confirmed by our atelier</div>
+  </div>
+</div>
+
+<!-- ZONE 10: GALLERY -->
+<div class="page" id="zone10">
+  <div class="zone-header">
+    <div class="zone-eyebrow">Community gallery</div>
+    <h1 class="zone-title">Made by people like you</h1>
+    <p class="zone-sub">Every piece started as a vibe. Browse, get inspired, or start with someone else's mood board.</p>
+  </div>
+  <div class="gallery-filters" id="gallery-filters"></div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+</div>
+
+<!-- MODAL CONTAINER -->
+<div id="modal-container"></div>
+<!-- LIGHTBOX CONTAINER -->
+<div id="lightbox-container"></div>
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<script>
+const STATE = {
+  zone: 'zone0',
+  model: null,
+  modelIcon: '💍',
+  modelName: 'Ring',
+  setPref: 'single',
+  vibeSelections: {},
+  moodboard: {
+    complexity: {label:'Complexity',value:'Ornate',icon:'🌸'},
+    finish: {label:'Finish',value:'Polished',icon:'✨'},
+    texture: {label:'Texture',value:'Faceted',icon:'⬡'},
+    metal: {label:'Metal',value:'Gold',icon:'🟡'},
+    volume: {label:'Volume',value:'Delicate',icon:'🪶'},
+    edge: {label:'Edge',value:'Rounded',icon:'⭕'}
+  },
+  manualParams: {
+    complexity:'Ornate', finish:'Polished', texture:'Faceted',
+    metal:'Gold', volume:'Delicate', edge:'Rounded'
+  },
+  history: [],
+  selectedPart: null
+};
+
+const MODELS = [
+  {id:'ring',icon:'💍',label:'Ring',tag:'Solitaire · Band · Signet'},
+  {id:'earring',icon:'🟡',label:'Earring',tag:'Stud · Drop · Hoop'},
+  {id:'necklace',icon:'📿',label:'Necklace',tag:'Pendant · Chain · Collar'},
+  {id:'bracelet',icon:'🪬',label:'Bracelet',tag:'Bangle · Cuff · Chain'},
+  {id:'brooch',icon:'✦',label:'Brooch',tag:'Pin · Clip · Scatter'},
+  {id:'hairpin',icon:'〰️',label:'Hair pin',tag:'Barrette · Fork · Bobby'},
+];
+
+const VIBES = [
+  ['Classic / Timeless','Contemporary / Avant-garde'],
+  ['Soft / Delicate','Bold / Sculptural'],
+  ['Organic / Flowing','Geometric / Structured'],
+  ['Warm / Intimate','Cool / Minimalist'],
+  ['Playful / Whimsical','Refined / Elegant'],
+  ['Earth / Raw','Air / Polished'],
+];
+
+const MB_OPTIONS = {
+  complexity: {label:'Complexity',opts:[{v:'Minimal',i:'◦'},{v:'Simple',i:'◻'},{v:'Ornate',i:'🌸'},{v:'Intricate',i:'❋'},{v:'Filigree',i:'🕸'}]},
+  finish: {label:'Finish',opts:[{v:'Matte',i:'▫'},{v:'Brushed',i:'≡'},{v:'Polished',i:'✨'},{v:'Hammered',i:'⊛'},{v:'Patina',i:'🍂'}]},
+  texture: {label:'Texture',opts:[{v:'Smooth',i:'○'},{v:'Faceted',i:'⬡'},{v:'Engraved',i:'◈'},{v:'Granulated',i:'⁘'}]},
+  metal: {label:'Metal color',opts:[{v:'Silver',i:'○'},{v:'Gold',i:'🟡'},{v:'Rose Gold',i:'🌸'},{v:'Platinum',i:'◇'},{v:'Two-tone',i:'◑'}]},
+  volume: {label:'Volume',opts:[{v:'Delicate',i:'🪶'},{v:'Standard',i:'◯'},{v:'Statement',i:'⬤'},{v:'Layered',i:'≋'}]},
+  edge: {label:'Edge',opts:[{v:'Rounded',i:'⭕'},{v:'Sharp',i:'◇'},{v:'Scalloped',i:'〜'},{v:'Irregular',i:'〰'}]},
+};
+
+const GALLERY_DATA = [
+  {mb:['🌿','⬡','🪨'],photo:'💍',vibe:'Organic / Flowing · Ring',review:'"Exactly the mood I had in my head."',model:'ring'},
+  {mb:['🔷','✦','🫧'],photo:'📿',vibe:'Geometric / Structured · Necklace',review:'"The 3D preview was spot on."',model:'necklace'},
+  {mb:['🌸','🍃','🌙'],photo:'🟡',vibe:'Soft / Delicate · Earrings',review:'"Delicate, just as I imagined."',model:'earring'},
+  {mb:['🏔','◻','❄'],photo:'🪬',vibe:'Cool / Minimalist · Bracelet',review:'"Clean lines, extraordinary craft."',model:'bracelet'},
+  {mb:['🔥','🌾','🌰'],photo:'✦',vibe:'Earth / Raw · Brooch',review:'"Raw and beautiful — got so many compliments."',model:'brooch'},
+  {mb:['💐','🌀','🫶'],photo:'💍',vibe:'Playful / Whimsical · Ring',review:'"Wore it to my sister\'s wedding. Perfect."',model:'ring'},
+  {mb:['⭐','🌊','🕊'],photo:'📿',vibe:'Air / Polished · Necklace',review:'"Understated and stunning."',model:'necklace'},
+  {mb:['🦋','🍃','🌺'],photo:'🟡',vibe:'Warm / Intimate · Earrings',review:'"Exactly what I envisioned for a gift."',model:'earring'},
+  {mb:['🔲','⬤','◼'],photo:'🪬',vibe:'Bold / Sculptural · Bracelet',review:'"Bold and wearable — rare combination."',model:'bracelet'},
+];
+
+const SET_TYPES = [
+  {id:'earring',icon:'🟡',name:'Earrings',desc:'Matching studs or drops',price:'€ 320'},
+  {id:'necklace',icon:'📿',name:'Necklace',desc:'Pendant on coordinating chain',price:'€ 550'},
+  {id:'bracelet',icon:'🪬',name:'Bracelet',desc:'Coordinating cuff or bangle',price:'€ 380'},
+];
+
+const PARTS = {
+  band: {name:'Band',meta:'The ring\'s structural body',params:['Metal color','Finish','Volume'],current:['Gold','Polished']},
+  stone: {name:'Stone setting',meta:'Prong mount and faceting',params:['Complexity','Texture','Edge'],current:['Ornate','Faceted']},
+};
+
+function goTo(zone) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(zone).classList.add('active');
+  STATE.zone = zone;
+  window.scrollTo(0,0);
+  addHistory(zone);
+  renderHistorySidebar();
+  if(zone === 'zone1') renderModels();
+  if(zone === 'zone2') renderVibes();
+  if(zone === 'zone3') renderMoodboard();
+  if(zone === 'zone4') renderManual();
+  if(zone === 'zone8') renderSetBuilder();
+  if(zone === 'zone10') renderGallery();
+}
+
+function addHistory(zone) {
+  const labels = {zone0:'Landing',zone1:'Model selection',zone2:'Vibe selection',zone3:'Mood board',zone4:'Manual control',zone5:'Composition',zone6:'3D model',zone7:'AR try-on',zone8:'Set builder',zone9:'Checkout',zone10:'Gallery'};
+  STATE.history = STATE.history.filter(h=>h.zone!==zone);
+  STATE.history.unshift({zone, label: labels[zone]||zone, ts: Date.now()});
+  STATE.history = STATE.history.slice(0,6);
+}
+
+function renderHistorySidebar() {
+  const el = document.getElementById('history-list');
+  if(!el) return;
+  el.innerHTML = STATE.history.slice(0,5).map(h=>`
+    <div class="history-item" onclick="goTo('${h.zone}');closeSidebar()">
+      <div class="history-label">${h.label}</div>
+    </div>
+  `).join('');
+}
+
+function openSidebar() { document.getElementById('sidebar').classList.add('open'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+
+function renderModels() {
+  const grid = document.getElementById('models-grid');
+  if(!grid) return;
+  grid.innerHTML = MODELS.map(m=>`
+    <div class="model-card" onclick="selectModel('${m.id}','${m.icon}','${m.label}')">
+      <div class="model-sketch">
+        <div style="font-size:3.5rem;opacity:0.8">${m.icon}</div>
+      </div>
+      <div class="model-label">${m.label}</div>
+      <div class="model-tag">${m.tag}</div>
+    </div>
+  `).join('');
+}
+
+function selectModel(id, icon, label) {
+  STATE.model = id; STATE.modelIcon = icon; STATE.modelName = label;
+  showModal(`
+    <div class="modal-title">${label}</div>
+    <div class="modal-sub">How would you like to design your ${label.toLowerCase()}?</div>
+    <div class="modal-options">
+      <button class="modal-opt" onclick="setPref('single');closeModal();goTo('zone2')">
+        <span class="modal-opt-icon">◇</span>
+        <div><div class="modal-opt-label">Single piece</div><div class="modal-opt-desc">Design just this ${label.toLowerCase()} for now</div></div>
+      </button>
+      <button class="modal-opt" onclick="setPref('later');closeModal();goTo('zone2')">
+        <span class="modal-opt-icon">◈</span>
+        <div><div class="modal-opt-label">Build a set later</div><div class="modal-opt-desc">Start with one, add matching pieces at the end</div></div>
+      </button>
+      <button class="modal-opt" onclick="setPref('set');closeModal();goTo('zone8')">
+        <span class="modal-opt-icon">◉</span>
+        <div><div class="modal-opt-label">I already know I want a set</div><div class="modal-opt-desc">Jump straight to the set builder</div></div>
+      </button>
+    </div>
+  `);
+}
+
+function setPref(p) { STATE.setPref = p; }
+
+function showModal(html) {
+  const c = document.getElementById('modal-container');
+  c.innerHTML = `<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><button class="modal-close" onclick="closeModal()">✕</button>${html}</div></div>`;
+}
+function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
+
+let currentVibeRow = 0;
+function renderVibes() {
+  const c = document.getElementById('vibe-content');
+  if(!c) return;
+  const pair = VIBES[currentVibeRow];
+  const descs = [
+    ['Enduring forms, refined tradition','Avant-garde shapes, unexpected materials'],
+    ['Gossamer weight, whisper presence','Commanding shapes, visual weight'],
+    ['Nature-inspired, asymmetric beauty','Precise angles, mathematical elegance'],
+    ['Intimate scale, personal warmth','Cool clarity, architectural restraint'],
+    ['Joyful movement, unexpected charm','Disciplined form, restrained beauty'],
+    ['Raw surfaces, honest material','Refined finish, ethereal lightness'],
+  ];
+  c.innerHTML = `
+    <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);text-align:center;padding:0 2.5rem 1.5rem">
+      Pair ${currentVibeRow+1} of ${VIBES.length}
+    </div>
+    <div class="vibe-grid">
+      <div class="vibe-card ${STATE.vibeSelections[currentVibeRow]===0?'selected':''}" onclick="selectVibe(0)">
+        <div class="vibe-name">${pair[0].split(' / ').join('<br>')}</div>
+        <div class="vibe-desc">${descs[currentVibeRow][0]}</div>
+      </div>
+      <div class="vibe-card ${STATE.vibeSelections[currentVibeRow]===1?'selected':''}" onclick="selectVibe(1)">
+        <div class="vibe-name">${pair[1].split(' / ').join('<br>')}</div>
+        <div class="vibe-desc">${descs[currentVibeRow][1]}</div>
+      </div>
+    </div>
+    <div class="vibe-actions">
+      <button class="btn-primary" onclick="acceptVibe()">Accept & continue →</button>
+      <button class="btn-ghost" onclick="goTo('zone3')">Accept mood board</button>
+      <button class="btn-ghost" onclick="goTo('zone4')">I want full manual control</button>
+    </div>
+  `;
+}
+
+function selectVibe(side) {
+  STATE.vibeSelections[currentVibeRow] = side;
+  const cards = document.querySelectorAll('.vibe-card');
+  cards.forEach((c,i)=>{c.classList.toggle('selected',i===side)});
+}
+
+function acceptVibe() {
+  if(STATE.vibeSelections[currentVibeRow] === undefined) { showToast('Please choose a side first'); return; }
+  if(currentVibeRow < VIBES.length - 1) {
+    currentVibeRow++;
+    renderVibes();
+    generateMoodboard();
+  } else {
+    currentVibeRow = 0;
+    generateMoodboard();
+    goTo('zone3');
+  }
+}
+
+function generateMoodboard() {
+  const icons = [['🌸','🏔','◦','◻','❋'],['✨','▫','≡','⊛','🍂'],['⬡','○','◈','⁘'],['🟡','○','🌸','◇'],['🪶','◯','⬤','≋'],['⭕','◇','〜','〰']];
+  const vals = ['complexity','finish','texture','metal','volume','edge'];
+  vals.forEach((k,i)=>{
+    const opts = MB_OPTIONS[k].opts;
+    const r = Math.floor(Math.random()*opts.length);
+    STATE.moodboard[k].value = opts[r].v;
+    STATE.moodboard[k].icon = opts[r].i;
+  });
+}
+
+function renderMoodboard() {
+  const grid = document.getElementById('moodboard-grid');
+  if(!grid) return;
+  grid.innerHTML = Object.entries(MB_OPTIONS).map(([key, cfg])=>{
+    const cur = STATE.moodboard[key];
+    return `
+      <div class="mb-card" onclick="openLightbox('${key}')">
+        <div class="mb-img"><span style="font-size:3rem">${cur.icon}</span></div>
+        <div class="mb-label">
+          <div>${cfg.label}</div>
+          <div class="mb-value">${cur.value}</div>
+        </div>
+        <div class="mb-tooltip">Edit</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openLightbox(paramKey) {
+  const cfg = MB_OPTIONS[paramKey];
+  const cur = STATE.moodboard[paramKey];
+  const c = document.getElementById('lightbox-container');
+  c.innerHTML = `
+    <div class="lightbox-overlay" onclick="if(event.target===this)closeLightbox()">
+      <div class="lightbox">
+        <button class="modal-close" onclick="closeLightbox()">✕</button>
+        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">${cfg.label}</div>
+        <div style="font-family:var(--serif);font-size:1.4rem;font-weight:300;color:var(--charcoal);margin-bottom:0.25rem">Choose an alternative</div>
+        <div style="font-size:0.82rem;color:var(--sepia);font-weight:300;margin-bottom:0">Not quite right? That's what the sketchbook is for.</div>
+        <div class="lightbox-grid">
+          ${cfg.opts.map(opt=>`
+            <div class="lb-img ${opt.v===cur.value?'selected':''}" onclick="selectLBOption('${paramKey}','${opt.v}','${opt.i}')">
+              <div style="text-align:center">
+                <div style="font-size:2rem;margin-bottom:0.25rem">${opt.i}</div>
+                <div style="font-family:var(--mono);font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--sepia)">${opt.v}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="lightbox-actions">
+          <button class="btn-primary" onclick="applyLB('${paramKey}','only')">Update this parameter</button>
+          <button class="btn-ghost" onclick="applyLB('${paramKey}','harmony')">Regenerate harmony</button>
+        </div>
+      </div>
+    </div>
+  `;
+  window._pendingLB = {key: paramKey, val: cur.value, icon: cur.icon};
+}
+
+function selectLBOption(key, val, icon) {
+  window._pendingLB = {key, val, icon};
+  document.querySelectorAll('.lb-img').forEach(el=>el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+function applyLB(key, mode) {
+  if(window._pendingLB) {
+    STATE.moodboard[key].value = window._pendingLB.val;
+    STATE.moodboard[key].icon = window._pendingLB.icon;
+    if(mode === 'harmony') generateMoodboard();
+  }
+  closeLightbox();
+  renderMoodboard();
+  showToast(mode === 'harmony' ? 'Harmony regenerated ✦' : 'Parameter updated');
+}
+
+function closeLightbox() { document.getElementById('lightbox-container').innerHTML = ''; }
+
+function saveMoodBoard() {
+  const name = prompt('Name this mood board:','My Mood Board') || 'Untitled';
+  showToast(`Saved: "${name}"`);
+}
+
+function renderManual() {
+  const c = document.getElementById('manual-params');
+  if(!c) return;
+  c.innerHTML = Object.entries(MB_OPTIONS).map(([key,cfg])=>`
+    <div class="param-block">
+      <div class="param-label">${cfg.label}</div>
+      <div class="param-options">
+        ${cfg.opts.map(opt=>`<button class="param-opt ${STATE.manualParams[key]===opt.v?'sel':''}" onclick="setManual('${key}','${opt.v}',this)">${opt.v}</button>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function setManual(key, val, btn) {
+  STATE.manualParams[key] = val;
+  STATE.moodboard[key].value = val;
+  btn.closest('.param-options').querySelectorAll('.param-opt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function selectParamOpt(btn) {
+  btn.closest('.param-options').querySelectorAll('.param-opt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function selectPart(partId) {
+  STATE.selectedPart = partId;
+  const p = PARTS[partId];
+  const el = document.getElementById('part-panel-area');
+  if(!el) return;
+  el.innerHTML = `
+    <div class="part-panel">
+      <div>
+        <div class="part-name">${p.name}</div>
+        <div class="part-meta">${p.meta}</div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Controls</div>
+        <div style="display:flex;flex-direction:column;gap:0.3rem">
+          ${p.params.map(param=>`<div style="font-size:0.82rem;color:var(--sepia)">· ${param}</div>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Current value</div>
+        <div class="part-value">${p.current.map(v=>`<span class="part-tag">${v}</span>`).join('')}</div>
+      </div>
+      <button class="btn-ghost" style="font-size:0.65rem" onclick="openLightbox('${partId==='band'?'metal':'complexity'}');goTo('zone3')">Change →</button>
+    </div>
+  `;
+}
+
+function hoverPart(partId, isIn) {
+  const el = document.getElementById('part-panel-area');
+  if(!STATE.selectedPart && el) {
+    if(isIn) {
+      const p = PARTS[partId];
+      el.innerHTML = `<div class="part-panel-empty"><div class="model3d-hint"><strong style="font-family:var(--serif);font-size:1rem;font-weight:300;color:var(--charcoal)">${p.name}</strong><br><span style="font-size:0.75rem">${p.meta}</span><br><br><span>Click to edit</span></div></div>`;
+    } else {
+      el.innerHTML = `<div class="part-panel-empty"><div class="model3d-hint" style="text-align:center;max-width:200px">Hover over a part of the model to see its details</div></div>`;
+    }
+  }
+}
+
+function switchARTab(tab) {
+  document.getElementById('tab-ar').classList.toggle('active', tab==='ar');
+  document.getElementById('tab-dim').classList.toggle('active', tab==='dim');
+  document.getElementById('ar-content').style.display = tab==='ar'?'block':'none';
+  document.getElementById('dim-content').style.display = tab==='dim'?'block':'none';
+}
+
+function renderSetBuilder() {
+  const el = document.getElementById('set-items');
+  if(!el) return;
+  const icon = document.getElementById('current-piece-icon');
+  const name = document.getElementById('current-piece-name');
+  const tags = document.getElementById('current-tags');
+  if(icon) icon.textContent = STATE.modelIcon;
+  if(name) name.textContent = STATE.modelName;
+  if(tags) tags.innerHTML = Object.values(STATE.moodboard).map(m=>`<span class="part-tag">${m.value}</span>`).join('');
+  
+  const filtered = SET_TYPES.filter(s=>s.id!==STATE.model);
+  el.innerHTML = filtered.map(s=>`
+    <div class="set-item-card">
+      <div class="set-item-sketch">${s.icon}</div>
+      <div class="set-item-info">
+        <div class="set-item-name">${s.name}</div>
+        <div class="set-item-desc">${s.desc} · <span style="color:var(--brass-dark)">${s.price}</span></div>
+      </div>
+      <button class="add-btn" onclick="addToSet(this,'${s.id}')">+ Add</button>
+    </div>
+  `).join('');
+}
+
+function addToSet(btn, id) {
+  btn.textContent = '✓ Added';
+  btn.style.background = 'var(--brass)';
+  btn.style.color = 'var(--paper)';
+  showToast('Added to your set ✦');
+}
+
+function renderGallery() {
+  const filters = document.getElementById('gallery-filters');
+  const grid = document.getElementById('gallery-grid');
+  if(!filters||!grid) return;
+  const filterItems = ['All','Ring','Earring','Necklace','Bracelet','Brooch','Organic','Geometric','Minimal','Bold'];
+  filters.innerHTML = filterItems.map((f,i)=>`<button class="filter-btn ${i===0?'active':''}" onclick="filterGallery(this,'${f}')">${f}</button>`).join('');
+  renderGalleryGrid(GALLERY_DATA);
+}
+
+function filterGallery(btn, val) {
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = val==='All' ? GALLERY_DATA : GALLERY_DATA.filter(g=>g.vibe.toLowerCase().includes(val.toLowerCase()));
+  renderGalleryGrid(filtered);
+}
+
+function renderGalleryGrid(data) {
+  const grid = document.getElementById('gallery-grid');
+  if(!grid) return;
+  grid.innerHTML = data.map(g=>`
+    <div class="gallery-card">
+      <div class="gallery-mb">${g.mb.map(img=>`<div class="gallery-mb-img">${img}</div>`).join('')}</div>
+      <div class="gallery-photo"><div class="gallery-photo-inner">${g.photo}</div></div>
+      <div class="gallery-info"><div class="gallery-vibe">${g.vibe}</div><div class="gallery-review">${g.review}</div></div>
+      <button class="gallery-use-btn" onclick="loadGalleryBoard(event,'${g.model}')">Use this board</button>
+    </div>
+  `).join('');
+}
+
+function loadGalleryBoard(e, model) {
+  e.stopPropagation();
+  STATE.model = model;
+  const m = MODELS.find(x=>x.id===model);
+  if(m){STATE.modelIcon=m.icon;STATE.modelName=m.label;}
+  generateMoodboard();
+  goTo('zone3');
+  showToast('Mood board loaded ✦');
+}
+
+function loadMoodBoard(type) { generateMoodboard(); goTo('zone3'); }
+
+function shareComp() { showToast('Composition link copied ✦'); }
+
+function placeOrder() {
+  const name = document.getElementById('design-name')?.value || 'Untitled';
+  showModal(`
+    <div style="text-align:center;padding:1rem 0">
+      <div style="font-size:3rem;margin-bottom:1rem">✉️</div>
+      <div class="modal-title">Order placed</div>
+      <div class="modal-sub" style="margin-bottom:1.5rem">Your design "<em>${name||'Custom '+STATE.modelName}</em>" is confirmed. Our atelier will be in touch within 48 hours with your production timeline.</div>
+      <div style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem">Estimated production · 6–8 weeks</div>
+      <button class="btn-primary" onclick="closeModal();goTo('zone10')">Explore the gallery</button>
+    </div>
+  `);
+}
+
+function showToast(msg) {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(), 3200);
+}
+
+function updateCheckoutIcon() {
+  const el = document.getElementById('checkout-icon');
+  const nameEl = document.getElementById('checkout-name');
+  if(el) el.textContent = STATE.modelIcon;
+  if(nameEl) nameEl.textContent = 'Custom '+STATE.modelName;
+}
+
+const origGoTo = goTo;
+window.goTo = function(zone) {
+  origGoTo(zone);
+  if(zone==='zone9') updateCheckoutIcon();
+  const mbName = document.getElementById('moodboard-name');
+  if(mbName && zone==='zone8') {
+    const names = ['Warm Geometric Study','Organic Whisper','Cool Edge Series','Raw Earth Tones','Soft Solstice'];
+    mbName.textContent = names[Math.floor(Math.random()*names.length)];
+  }
+};
+
+goTo('zone0');
+</script>
+</body>
+</html>
