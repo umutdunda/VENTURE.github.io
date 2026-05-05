@@ -1,9 +1,10 @@
+cat > /mnt/user-data/outputs/index.html << 'ENDHTML'
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Au·lieu — Bespoke Accessory Configurator</title>
+<title>Sintra — Bespoke Accessory Configurator</title>
 <script src="https://js.puter.com/v2/"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Figtree:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -16,11 +17,16 @@
 }
 body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden}
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;background:rgba(249,246,240,0.94);backdrop-filter:blur(10px);border-bottom:1px solid rgba(199,164,91,0.15)}
-.logo{font-family:var(--serif);font-size:1.4rem;font-weight:300;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--charcoal)}
-.logo b{color:var(--brass);font-weight:300}
+.logo{font-family:var(--serif);font-size:1.4rem;font-weight:300;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;color:var(--charcoal)}
+.logo span{color:var(--brass)}
 .nav{display:flex;gap:2rem;list-style:none}
 .nav a{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--sepia);cursor:pointer;transition:color .2s}
 .nav a:hover{color:var(--brass)}
+/* API KEY BADGE */
+.api-btn{font-family:var(--mono);font-size:.57rem;letter-spacing:.1em;text-transform:uppercase;padding:.38rem .85rem;background:transparent;color:var(--muted);border:1px solid rgba(199,164,91,.3);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.4rem}
+.api-btn:hover{border-color:var(--brass);color:var(--charcoal)}
+.api-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .2s}
+.api-dot.ok{background:#6BAF7A}
 .page{display:none;min-height:100vh;padding-top:72px;animation:fadeUp .5s var(--ease)}
 .page.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -39,6 +45,18 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 @keyframes rot{to{transform:rotate(360deg)}}
 .gen-overlay{position:absolute;inset:0;background:rgba(44,44,44,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;z-index:5}
 .gen-text{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--brass)}
+/* API KEY MODAL */
+.api-modal{position:fixed;inset:0;background:rgba(44,44,44,.6);z-index:800;display:flex;align-items:center;justify-content:center;padding:1.5rem;animation:fi .25s}
+.api-box{background:var(--paper2);max-width:460px;width:100%;padding:2.4rem;position:relative}
+.api-title{font-family:var(--serif);font-size:1.5rem;font-weight:300;color:var(--charcoal);margin-bottom:.3rem}
+.api-sub{font-size:.8rem;color:var(--sepia);font-weight:300;margin-bottom:1.5rem;line-height:1.65}
+.api-input{width:100%;padding:.75rem 1rem;border:1px solid rgba(44,44,44,.18);background:var(--paper);font-family:var(--mono);font-size:.75rem;color:var(--charcoal);outline:none;letter-spacing:.04em;transition:border-color .2s}
+.api-input:focus{border-color:var(--brass)}
+.api-note{font-size:.72rem;color:var(--muted);font-weight:300;margin-top:.55rem;line-height:1.55}
+.api-actions{display:flex;gap:.6rem;margin-top:1.2rem;flex-wrap:wrap}
+.api-provider-tabs{display:flex;gap:0;margin-bottom:1.2rem;border:1px solid rgba(44,44,44,.13)}
+.api-pt{flex:1;padding:.5rem;font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:none;cursor:pointer;color:var(--muted);transition:all .2s}
+.api-pt.active{background:var(--charcoal);color:var(--paper)}
 /* HERO */
 .hero{min-height:calc(100vh - 72px);display:grid;place-items:center;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 40%,rgba(199,164,91,.07) 0%,transparent 70%)}
@@ -51,17 +69,11 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 .sk path{stroke-dasharray:700;stroke-dashoffset:700;animation:draw 2.4s var(--ease) forwards}
 .sk path:nth-child(1){animation-delay:.1s}.sk path:nth-child(2){animation-delay:.5s}.sk path:nth-child(3){animation-delay:.9s}.sk path:nth-child(4){animation-delay:1.3s}.sk path:nth-child(5){animation-delay:1.7s}
 @keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
 /* GALLERY CARDS */
-.gc{cursor:pointer;position:relative;transition:transform .4s var(--ease)}
-.gc:hover{transform:translateY(-5px)}
-.gc-photo{overflow:hidden;background:var(--charcoal)}
-.gc-photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s var(--ease)}
-.gc:hover .gc-photo img{transform:scale(1.05)}
 .gc-info{padding:.85rem;background:var(--paper2);border:1px solid rgba(199,164,91,.1);border-top:none}
 .gc-vibe{font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brass-d);margin-bottom:.3rem}
 .gc-review{font-size:.78rem;color:var(--sepia);font-style:italic;font-weight:300}
-.gc-use{position:absolute;top:.6rem;right:.6rem;background:var(--charcoal);color:var(--paper);padding:.3rem .6rem;font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:opacity .2s;border:none;cursor:pointer}
-.gc:hover .gc-use{opacity:1}
 /* MODELS */
 .models-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:1.25rem;padding:1.5rem 2.5rem 4rem;max-width:1100px;margin:0 auto}
 .mc{cursor:pointer;text-align:center;transition:transform .4s var(--ease)}
@@ -74,8 +86,7 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 .mc:hover .mc-lbl{color:var(--brass)}
 .mc-sub{font-family:var(--mono);font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.15rem}
 /* MODAL */
-.mo{position:fixed;inset:0;background:rgba(44,44,44,.55);z-index:600;display:flex;align-items:center;justify-content:center;padding:1rem;animation:fi .3s}
-@keyframes fi{from{opacity:0}to{opacity:1}}
+.mo{position:fixed;inset:0;background:rgba(44,44,44,.55);z-index:600;display:flex;align-items:center;justify-content:center;padding:1rem}
 .mb-box{background:var(--paper2);max-width:440px;width:100%;padding:2.6rem;position:relative}
 .mb-x{position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);padding:.25rem}
 .mb-t{font-family:var(--serif);font-size:1.45rem;font-weight:300;margin-bottom:.35rem;color:var(--charcoal)}
@@ -95,28 +106,26 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 .vc-img{height:280px;position:relative;overflow:hidden;background:var(--charcoal)}
 .vc-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
 .vc:hover .vc-img img{transform:scale(1.04)}
-.vc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,24,18,.7) 0%,transparent 50%)}
+.vc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(30,24,18,.72) 0%,transparent 50%)}
 .vc-check{position:absolute;top:.7rem;right:.7rem;width:26px;height:26px;background:var(--brass);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--charcoal);z-index:3}
 .vc.chosen .vc-check{display:flex}
 .vc-txt{position:absolute;bottom:0;left:0;right:0;padding:1.2rem 1.1rem;z-index:2}
-.vc-name{font-family:var(--serif);font-size:1.5rem;font-weight:300;color:#fff;margin-bottom:.1rem;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.vc-name{font-family:var(--serif);font-size:1.5rem;font-weight:300;color:#fff;margin-bottom:.1rem;text-shadow:0 1px 6px rgba(0,0,0,.5)}
 .vc-sub{font-family:var(--mono);font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:.18rem}
 .vc-desc{font-size:.72rem;color:rgba(255,255,255,.75);font-style:italic;font-weight:300}
 .vibe-dots{display:flex;gap:.4rem;justify-content:center;padding:.9rem 0 1.5rem}
 .vd{width:7px;height:7px;border-radius:50%;background:rgba(199,164,91,.25);transition:background .3s}
 .vd.done{background:var(--brass-d)}.vd.active{background:var(--brass)}
 .vibe-skip{max-width:920px;margin:0 auto;padding:.5rem 2rem 3rem;display:flex;gap:.75rem;flex-wrap:wrap}
-/* MOODBOARD — no labels, pure image pinterest grid */
-.mb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:1.5rem 2.5rem;max-width:960px;margin:0 auto}
-.mbc{cursor:pointer;position:relative;overflow:hidden;transition:transform .35s}
-.mbc:hover{transform:scale(1.02)}
-.mbc-img{aspect-ratio:1;background:var(--charcoal);overflow:hidden;position:relative}
-.mbc-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.mbc:hover .mbc-img img{transform:scale(1.06)}
-/* hover overlay shows the parameter value subtly */
-.mbc-hover{position:absolute;inset:0;background:rgba(44,44,44,.55);display:flex;align-items:flex-end;padding:.55rem;opacity:0;transition:opacity .2s}
-.mbc:hover .mbc-hover{opacity:1}
-.mbc-hover-txt{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brass-l);line-height:1.3}
+/* MOODBOARD — pure image Pinterest grid, ZERO text labels */
+.mb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:1.5rem 2.5rem;max-width:960px;margin:0 auto}
+.mbc{cursor:pointer;position:relative;overflow:hidden;aspect-ratio:1}
+.mbc img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .55s var(--ease),filter .3s}
+.mbc:hover img{transform:scale(1.07);filter:brightness(.88)}
+/* on hover show a brass ring border — NO text at all */
+.mbc::after{content:'';position:absolute;inset:0;border:3px solid transparent;transition:border-color .2s;pointer-events:none}
+.mbc:hover::after{border-color:var(--brass)}
+.mbc.chosen::after{border-color:var(--brass);border-width:4px}
 .mb-actions{max-width:960px;margin:0 auto;padding:.75rem 2.5rem 3rem;display:flex;gap:.75rem;flex-wrap:wrap}
 /* MANUAL */
 .manual-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;max-width:1060px;margin:0 auto;padding:1.5rem 2.5rem 4rem;align-items:start}
@@ -133,7 +142,7 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 .comp-wrap{max-width:840px;margin:0 auto;padding:3rem 2.5rem}
 .comp-svg{width:100%;max-width:560px;display:block;margin:0 auto 2.5rem}
 .comp-foot{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
-/* Z6 */
+/* Z6 RENDER */
 .v6-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:2.5rem;max-width:1180px;margin:0 auto;padding:1.5rem 2.5rem 4rem;align-items:start}
 .render-area{background:var(--charcoal);position:relative;overflow:hidden;min-height:460px;display:flex;align-items:center;justify-content:center}
 .render-area img.main{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
@@ -201,7 +210,6 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 .fb{padding:.32rem .85rem;border:1px solid rgba(44,44,44,.12);background:transparent;cursor:pointer;font-family:var(--mono);font-size:.57rem;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;color:var(--sepia)}
 .fb:hover,.fb.active{border-color:var(--brass);color:var(--charcoal);background:rgba(199,164,91,.07)}
 .gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;padding:1.6rem 2.5rem 4rem}
-/* Gallery card — user-feel: photo first, no mood board strip */
 .gc-user{cursor:pointer;position:relative;transition:transform .4s var(--ease)}
 .gc-user:hover{transform:translateY(-5px)}
 .gc-user-photo{aspect-ratio:3/4;overflow:hidden;background:var(--charcoal)}
@@ -214,10 +222,9 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 .lb-ov{position:fixed;inset:0;background:rgba(44,44,44,.8);z-index:700;display:flex;align-items:center;justify-content:center;padding:1.5rem;animation:fi .25s}
 .lb-box{background:var(--paper2);max-width:560px;width:100%;padding:2.1rem;position:relative;max-height:90vh;overflow-y:auto}
 .lb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin:1.1rem 0}
-.lb-img-wrap{aspect-ratio:1;background:var(--charcoal);cursor:pointer;border:2px solid transparent;overflow:hidden;position:relative;transition:border-color .2s}
+.lb-img-wrap{aspect-ratio:1;background:var(--charcoal);cursor:pointer;border:3px solid transparent;overflow:hidden;position:relative;transition:border-color .2s}
 .lb-img-wrap:hover,.lb-img-wrap.sel{border-color:var(--brass)}
 .lb-img-wrap img{width:100%;height:100%;object-fit:cover}
-.lb-img-lbl{font-family:var(--mono);font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.3rem;text-align:center}
 .lb-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem}
 /* SIDEBAR */
 .sidebar{position:fixed;top:0;right:0;bottom:0;width:295px;background:var(--paper2);border-left:1px solid rgba(199,164,91,.18);z-index:400;transform:translateX(100%);transition:transform .5s var(--ease);padding:4.5rem 1.35rem 2rem;overflow-y:auto}
@@ -234,12 +241,9 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 @keyframes tout{to{opacity:0}}
 .footer{background:var(--charcoal);color:rgba(249,246,240,.55);padding:2.6rem 2.5rem}
 .footer-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1.8rem;max-width:1100px;margin:0 auto}
-.fb-brand{font-family:var(--serif);font-size:1.05rem;font-weight:300;color:var(--paper);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem}
-.fb-brand b{color:var(--brass);font-weight:300}
+.fb-brand{font-family:var(--serif);font-size:1.05rem;font-weight:300;color:var(--paper);letter-spacing:.18em;text-transform:uppercase;margin-bottom:.5rem}
 .fc-t{font-family:var(--mono);font-size:.57rem;letter-spacing:.15em;text-transform:uppercase;color:var(--brass);margin-bottom:.55rem}
-.fl{list-style:none}
-.fl li{font-size:.77rem;padding:.18rem 0;cursor:pointer;transition:color .2s}
-.fl li:hover{color:var(--paper)}
+.fl{list-style:none}.fl li{font-size:.77rem;padding:.18rem 0;cursor:pointer;transition:color .2s}.fl li:hover{color:var(--paper)}
 @media(max-width:768px){
   .hdr{padding:.9rem 1.25rem}.nav{gap:1rem}.nav a{font-size:.52rem}
   .zh{padding:2.5rem 1.25rem 1.5rem}
@@ -253,13 +257,17 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 <body>
 
 <header class="hdr">
-  <div class="logo" onclick="goTo('z0')">Au<b>&middot;</b>lieu</div>
+  <div class="logo" onclick="goTo('z0')">SINTRA</div>
   <nav><ul class="nav">
     <li><a onclick="goTo('z1')">Design</a></li>
     <li><a onclick="goTo('z10')">Gallery</a></li>
     <li><a style="opacity:.4;cursor:default">Collaborate</a></li>
     <li><a onclick="openSB()">Sketchbook</a></li>
   </ul></nav>
+  <button class="api-btn" onclick="openAPIModal()" id="api-status-btn">
+    <span class="api-dot" id="api-dot"></span>
+    <span id="api-label">Connect AI</span>
+  </button>
 </header>
 
 <button class="fab" onclick="openSB()" aria-label="Sketchbook">
@@ -301,7 +309,6 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
       </div>
     </div>
   </section>
-  <!-- TEASER: natural/candid user photos -->
   <section style="padding:3.5rem 2.5rem;max-width:1100px;margin:0 auto">
     <div style="text-align:center;margin-bottom:2.2rem">
       <div class="ze">From our community</div>
@@ -311,7 +318,7 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
   </section>
   <footer class="footer">
     <div class="footer-g">
-      <div><div class="fb-brand">Au<b>&middot;</b>lieu</div><p style="font-size:.77rem;line-height:1.7;font-weight:300">Bespoke accessories, made one at a time. Each piece begins with AI and ends with a craftsperson&rsquo;s hands.</p></div>
+      <div><div class="fb-brand">SINTRA</div><p style="font-size:.77rem;line-height:1.7;font-weight:300">Bespoke accessories, made one at a time. Each piece begins with AI and ends with a craftsperson&rsquo;s hands.</p></div>
       <div><div class="fc-t">Process</div><ul class="fl"><li>How it works</li><li>AI + Craft</li><li>Sustainability</li><li>Timeline</li></ul></div>
       <div><div class="fc-t">Studio</div><ul class="fl"><li>About us</li><li>Collaborators</li><li>Press</li><li>Contact</li></ul></div>
       <div><div class="fc-t">Newsletter</div><input style="width:100%;margin-bottom:.6rem;background:rgba(255,255,255,.06);border:1px solid rgba(199,164,91,.25);color:var(--paper);padding:.68rem .85rem;font-size:.87rem;outline:none;font-family:var(--sans)" placeholder="Your email"><button class="btn-g" style="width:100%;font-size:.58rem;padding:.55rem;color:var(--paper);border-color:rgba(199,164,91,.3)">Subscribe &rarr;</button></div>
@@ -321,31 +328,19 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 
 <!-- Z1 MODEL SELECTION -->
 <div class="page" id="z1">
-  <div class="zh">
-    <div class="ze">Step 1 of 7</div>
-    <h1 class="zt">What would you like to design?</h1>
-    <p class="zs">Choose your accessory. The AI will sketch it in your chosen style.</p>
-  </div>
+  <div class="zh"><div class="ze">Step 1 of 7</div><h1 class="zt">What would you like to design?</h1><p class="zs">Choose your accessory. The AI will sketch it in your chosen style.</p></div>
   <div class="models-grid" id="models-grid"></div>
 </div>
 
-<!-- Z2 VIBE SELECTION — static images, auto-advance -->
+<!-- Z2 VIBE SELECTION -->
 <div class="page" id="z2">
-  <div class="zh">
-    <div class="ze">Step 2 of 7</div>
-    <h1 class="zt">What&rsquo;s the feeling?</h1>
-    <p class="zs">Tap a card &mdash; we move straight to the next pair. No confirmation needed.</p>
-  </div>
+  <div class="zh"><div class="ze">Step 2 of 7</div><h1 class="zt">What&rsquo;s the feeling?</h1><p class="zs">Tap a card &mdash; we move straight to the next pair.</p></div>
   <div id="vibe-content"></div>
 </div>
 
-<!-- Z3 MOOD BOARD — static images, Pinterest-style, no text labels -->
+<!-- Z3 MOOD BOARD — pure image grid, zero text -->
 <div class="page" id="z3">
-  <div class="zh">
-    <div class="ze">Step 3 of 7</div>
-    <h1 class="zt">Your design language</h1>
-    <p class="zs">Hover any image to see the parameter. Tap to swap it.</p>
-  </div>
+  <div class="zh"><div class="ze">Step 3 of 7</div><h1 class="zt">Your design language</h1><p class="zs">Hover any image to highlight it. Tap to swap that direction.</p></div>
   <div class="mb-grid" id="mb-grid"></div>
   <div class="mb-actions">
     <button class="btn-p" onclick="goTo('z5')">Approve &amp; continue &rarr;</button>
@@ -356,11 +351,7 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 
 <!-- Z4 MANUAL -->
 <div class="page" id="z4">
-  <div class="zh">
-    <div class="ze">Manual Control</div>
-    <h1 class="zt">Fine-tune every detail</h1>
-    <p class="zs">Pick each parameter &mdash; the AI renders a preview live.</p>
-  </div>
+  <div class="zh"><div class="ze">Manual Control</div><h1 class="zt">Fine-tune every detail</h1><p class="zs">Pick each parameter &mdash; the AI renders a preview.</p></div>
   <div class="manual-wrap">
     <div id="manual-params"></div>
     <div class="prev-sticky">
@@ -369,35 +360,25 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
       <button class="btn-p" style="width:100%;margin-top:.6rem" onclick="genPreview()">Generate preview &rarr;</button>
     </div>
   </div>
-  <div style="padding:0 2.5rem 4rem;display:flex;gap:.75rem;flex-wrap:wrap">
-    <button class="btn-p" onclick="goTo('z5')">Save &amp; continue &rarr;</button>
-  </div>
+  <div style="padding:0 2.5rem 4rem"><button class="btn-p" onclick="goTo('z5')">Save &amp; continue &rarr;</button></div>
 </div>
 
 <!-- Z5 COMPOSITION -->
 <div class="page" id="z5">
   <div class="comp-wrap">
     <div style="text-align:center;margin-bottom:2.2rem">
-      <div class="ze">Step 4 of 7</div>
-      <h1 class="zt">This is your design language</h1>
-      <p class="zs">An artistic composition of your parameters. Touch the gold circles to edit individual elements.</p>
+      <div class="ze">Step 4 of 7</div><h1 class="zt">This is your design language</h1>
+      <p class="zs">An artistic composition of your parameters. Touch the gold circles to edit elements.</p>
     </div>
     <svg class="comp-svg" viewBox="0 0 560 390" xmlns="http://www.w3.org/2000/svg">
       <rect width="560" height="390" fill="#FDFAF5"/>
-      <g opacity=".65">
-        <path d="M76 280C76 190 112 142 93 72" fill="none" stroke="#6B7A4A" stroke-width="1.3"/>
-        <path d="M93 72C119 53 146 81 128 110C110 139 83 128 93 72Z" fill="rgba(107,122,74,.17)" stroke="#6B7A4A" stroke-width=".85"/>
-        <path d="M93 121C75 103 47 121 65 150C83 179 102 161 93 121Z" fill="rgba(107,122,74,.12)" stroke="#6B7A4A" stroke-width=".7"/>
-      </g>
+      <g opacity=".65"><path d="M76 280C76 190 112 142 93 72" fill="none" stroke="#6B7A4A" stroke-width="1.3"/>
+      <path d="M93 72C119 53 146 81 128 110C110 139 83 128 93 72Z" fill="rgba(107,122,74,.17)" stroke="#6B7A4A" stroke-width=".85"/>
+      <path d="M93 121C75 103 47 121 65 150C83 179 102 161 93 121Z" fill="rgba(107,122,74,.12)" stroke="#6B7A4A" stroke-width=".7"/></g>
       <ellipse cx="278" cy="188" rx="82" ry="63" fill="rgba(122,107,85,.08)" stroke="#7A6B55" stroke-width=".85"/>
-      <ellipse cx="278" cy="188" rx="54" ry="40" fill="rgba(122,107,85,.06)" stroke="#7A6B55" stroke-width=".65"/>
       <path d="M242 169C250 150 278 140 296 159C314 178 305 206 287 215C259 225 238 201 242 169Z" fill="rgba(199,164,91,.12)" stroke="#C7A45B" stroke-width="1.05"/>
       <rect x="392" y="70" width="72" height="72" fill="none" stroke="#2C2C2C" stroke-width=".85" transform="rotate(14,428,106)"/>
-      <rect x="400" y="78" width="56" height="56" fill="none" stroke="#C7A45B" stroke-width=".55" transform="rotate(14,428,106)"/>
       <path d="M136 356C182 338 228 348 276 334C324 320 370 334 416 320" fill="none" stroke="#7A6B55" stroke-width=".85" stroke-dasharray="7,4"/>
-      <text x="54" y="314" font-family="JetBrains Mono,monospace" font-size="6" fill="#9E8E7A" letter-spacing="2">VOLUME</text>
-      <text x="237" y="274" font-family="JetBrains Mono,monospace" font-size="6" fill="#9E8E7A" letter-spacing="2">TEXTURE</text>
-      <text x="392" y="160" font-family="JetBrains Mono,monospace" font-size="6" fill="#9E8E7A" letter-spacing="2">FORM</text>
       <circle cx="278" cy="188" r="9" fill="rgba(199,164,91,.75)" style="cursor:pointer" onclick="openLB('texture')"/>
       <circle cx="428" cy="106" r="9" fill="rgba(199,164,91,.75)" style="cursor:pointer" onclick="openLB('complexity')"/>
       <circle cx="83" cy="190" r="9" fill="rgba(199,164,91,.75)" style="cursor:pointer" onclick="openLB('volume')"/>
@@ -411,24 +392,17 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 
 <!-- Z6 AI RENDER -->
 <div class="page" id="z6">
-  <div class="zh">
-    <div class="ze">Step 5 of 7</div>
-    <h1 class="zt">Your piece, rendered by AI</h1>
-    <p class="zs">Puter.js generates your design using Gemini Imagen &mdash; free for you as a developer.</p>
-  </div>
+  <div class="zh"><div class="ze">Step 5 of 7</div><h1 class="zt">Your piece, rendered by AI</h1><p class="zs">Regenerate as many times as you like.</p></div>
   <div class="v6-wrap">
     <div>
       <div class="render-area" id="main-render">
-        <div class="render-ph" id="render-ph">
-          <span class="render-ph-icon" id="render-ph-icon">&#128141;</span>
-          <div class="render-ph-t">Generating your piece&hellip;</div>
-        </div>
+        <div class="render-ph" id="render-ph"><span class="render-ph-icon">&#128141;</span><div class="render-ph-t">Generating&hellip;</div></div>
         <div class="gen-overlay" id="render-gen" style="display:none">
           <div class="spin" style="width:34px;height:34px;border-width:3px"></div>
-          <div class="gen-text">Gemini Imagen via Puter.js</div>
-          <div style="font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(249,246,240,.35);max-width:200px;text-align:center;line-height:1.6" id="render-step">Composing parameters&hellip;</div>
+          <div class="gen-text">AI Rendering</div>
+          <div style="font-family:var(--mono);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(249,246,240,.35);max-width:200px;text-align:center;line-height:1.6" id="render-step">Composing&hellip;</div>
         </div>
-        <div class="render-corner" id="render-corner">AI Render &middot; Gemini Imagen</div>
+        <div class="render-corner" id="render-corner">AI Render</div>
       </div>
       <div class="flex-row" style="margin-top:.7rem">
         <button class="btn-p" style="flex:1" onclick="genMainRender()">Regenerate &rarr;</button>
@@ -441,7 +415,7 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
       <div style="margin-top:1.1rem">
         <div class="fc-t" style="margin-bottom:.45rem">Style variations</div>
         <div class="vars-grid" id="vars-grid"></div>
-        <div style="font-size:.7rem;color:var(--muted);font-style:italic;margin-top:.35rem">Click a variation to set as main render</div>
+        <div style="font-size:.7rem;color:var(--muted);font-style:italic;margin-top:.35rem">Click to set as main</div>
       </div>
     </div>
     <div class="v6-bottom">
@@ -453,11 +427,7 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 
 <!-- Z7 AR TRY-ON -->
 <div class="page" id="z7">
-  <div class="zh">
-    <div class="ze">Step 6 of 7</div>
-    <h1 class="zt">Try it on</h1>
-    <p class="zs">Upload a photo of your hand &mdash; the AI will place the ring on your finger. Or enter your dimensions.</p>
-  </div>
+  <div class="zh"><div class="ze">Step 6 of 7</div><h1 class="zt">Try it on</h1><p class="zs">Upload a photo of your hand &mdash; the AI will place the ring on your finger.</p></div>
   <div class="ar-wrap">
     <div class="ar-tabs">
       <button class="ar-tab active" id="tab-ar" onclick="switchAR('ar')">AI Try-on</button>
@@ -468,17 +438,17 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
         <input type="file" id="finger-upload" accept="image/*" style="display:none" onchange="handleFingerUpload(event)">
         <span class="upload-icon">&#128247;</span>
         <div class="upload-title">Upload a photo of your hand</div>
-        <div class="upload-hint">Best results: flat hand, natural light, fingers slightly spread<br>JPG or PNG &middot; The AI will place your ring on your finger</div>
+        <div class="upload-hint">Best results: flat hand, natural light, fingers slightly spread</div>
       </div>
       <div class="ar-result" id="ar-result">
-        <div class="ar-result-ph"><span class="ar-result-ph-icon">&#128141;</span><div class="ar-result-ph-t">Upload a hand photo to see your ring on your finger</div></div>
+        <div class="ar-result-ph"><span class="ar-result-ph-icon">&#128141;</span><div class="ar-result-ph-t">Upload a hand photo to try on your ring</div></div>
       </div>
       <div id="ar-status" style="font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:1rem;min-height:1.2em"></div>
       <div class="flex-row" style="margin-bottom:1.5rem">
         <button class="btn-g" style="flex:1" onclick="goTo('z6')">Adjust design</button>
         <button class="btn-p" style="flex:1" onclick="goTo('z8')">Looks good &rarr;</button>
       </div>
-      <div style="font-size:.72rem;color:var(--muted);font-family:var(--mono);letter-spacing:.07em;text-align:center">Your photo is processed locally and never stored on any server</div>
+      <div style="font-size:.72rem;color:var(--muted);font-family:var(--mono);letter-spacing:.07em;text-align:center">Your photo is never stored on any server</div>
     </div>
     <div id="dim-pane" style="display:none">
       <div class="dim-group"><label class="dim-lbl">Ring size (US)</label><input class="dim-in" placeholder="e.g. 7 or 7.5"></div>
@@ -495,18 +465,13 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 
 <!-- Z8 SET BUILDER -->
 <div class="page" id="z8">
-  <div class="zh">
-    <div class="ze">Step 7 of 7</div>
-    <h1 class="zt">Make it a set</h1>
-    <p class="zs">Your mood board is saved. The AI can generate matching pieces using the same design language.</p>
-  </div>
+  <div class="zh"><div class="ze">Step 7 of 7</div><h1 class="zt">Make it a set</h1><p class="zs">Your mood board is saved. The AI can generate matching pieces.</p></div>
   <div class="set-wrap">
     <div class="set-saved">
       <span style="font-size:1.9rem">&#128221;</span>
-      <div>
-        <div class="fc-t" style="margin-bottom:.2rem">Saved mood board</div>
+      <div><div class="fc-t" style="margin-bottom:.2rem">Saved mood board</div>
         <div style="font-family:var(--serif);font-size:1.05rem;color:var(--charcoal)">&ldquo;<span id="mb-name">Warm Geometric Study</span>&rdquo;</div>
-        <div style="font-size:.73rem;color:var(--sepia);font-weight:300;margin-top:.15rem">6 parameters locked &middot; AI-generated</div>
+        <div style="font-size:.73rem;color:var(--sepia);font-weight:300;margin-top:.15rem">6 parameters locked</div>
       </div>
     </div>
     <div class="set-grid">
@@ -520,8 +485,7 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
         </div>
         <button class="btn-p" style="width:100%" onclick="goTo('z9')">Order this piece &rarr;</button>
       </div>
-      <div>
-        <div class="fc-t" style="margin-bottom:.65rem">Add matching pieces</div>
+      <div><div class="fc-t" style="margin-bottom:.65rem">Add matching pieces</div>
         <div id="set-items"></div>
         <button class="btn-g" style="width:100%;margin-top:.7rem" onclick="goTo('z9')">Add set to cart &rarr;</button>
       </div>
@@ -531,7 +495,7 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
 
 <!-- Z9 CHECKOUT -->
 <div class="page" id="z9">
-  <div class="zh"><div class="ze">Checkout</div><h1 class="zt">Almost there</h1><p class="zs">Give your piece a name. We&rsquo;ll keep it in your archive forever.</p></div>
+  <div class="zh"><div class="ze">Checkout</div><h1 class="zt">Almost there</h1><p class="zs">Give your piece a name. We&rsquo;ll keep it in your archive.</p></div>
   <div class="co-wrap">
     <div class="co-sum">
       <div class="co-thumb" id="co-thumb"><span style="font-size:2rem" id="co-thumb-icon">&#128141;</span></div>
@@ -546,29 +510,132 @@ body{background:var(--paper);color:var(--brown);font-family:var(--sans);font-siz
     </div>
     <div class="co-sec"><div class="co-lbl">Name your design</div><input class="co-in" placeholder="e.g. The Solstice Ring" id="design-name"></div>
     <div class="co-sec"><div class="co-lbl">Contact</div><input class="co-in" placeholder="Full name"><input class="co-in" placeholder="Email address"></div>
-    <div class="co-sec"><div class="co-lbl">Shipping address</div><input class="co-in" placeholder="Address line 1"><input class="co-in" placeholder="City, Postcode, Country"></div>
+    <div class="co-sec"><div class="co-lbl">Shipping</div><input class="co-in" placeholder="Address line 1"><input class="co-in" placeholder="City, Postcode, Country"></div>
     <div class="co-sec"><div class="co-lbl">Preferences</div>
-      <label class="co-chk"><input type="checkbox" checked><span class="co-chk-t">Share my mood board &amp; final piece to the Gallery (opt-in)</span></label>
+      <label class="co-chk"><input type="checkbox" checked><span class="co-chk-t">Share my mood board &amp; final piece to the Gallery</span></label>
       <label class="co-chk"><input type="checkbox"><span class="co-chk-t">This is a gift &mdash; ship to a different address</span></label>
     </div>
     <button class="btn-p" style="width:100%;padding:1.05rem;font-size:.7rem" onclick="placeOrder()">Place order &rarr;</button>
-    <div style="margin-top:.85rem;font-size:.68rem;color:var(--muted);text-align:center;font-family:var(--mono);letter-spacing:.07em">No card charged until your design is confirmed by our atelier</div>
+    <div style="margin-top:.85rem;font-size:.68rem;color:var(--muted);text-align:center;font-family:var(--mono);letter-spacing:.07em">No card charged until your design is confirmed</div>
   </div>
 </div>
 
 <!-- Z10 GALLERY -->
 <div class="page" id="z10">
-  <div class="zh"><div class="ze">Community gallery</div><h1 class="zt">Made by people like you</h1><p class="zs">Every piece started as a vibe. Browse, get inspired, or start with someone&rsquo;s mood board.</p></div>
+  <div class="zh"><div class="ze">Community gallery</div><h1 class="zt">Made by people like you</h1><p class="zs">Every piece started as a vibe. Browse, get inspired, or use someone&rsquo;s mood board.</p></div>
   <div class="gal-filters" id="gal-filters"></div>
   <div class="gal-grid" id="gal-grid"></div>
 </div>
 
 <div id="modal-root"></div>
 <div id="lb-root"></div>
+<div id="api-modal-root"></div>
 <div id="toast-root"></div>
 
 <script>
-// ═══════════ STATE ═══════════
+// ═══ API KEY STATE ═══
+var AI={
+  provider: localStorage.getItem('sintra_provider') || 'puter',  // 'puter' | 'openai'
+  openaiKey: localStorage.getItem('sintra_openai_key') || ''
+};
+
+function updateAPIStatus(){
+  var dot=document.getElementById('api-dot');
+  var lbl=document.getElementById('api-label');
+  if(!dot||!lbl)return;
+  if(AI.provider==='openai'&&AI.openaiKey){
+    dot.className='api-dot ok';lbl.textContent='ChatGPT connected';
+  } else {
+    dot.className='api-dot';lbl.textContent='Connect AI';
+  }
+}
+
+function openAPIModal(){
+  var html='<div class="api-box" onclick="event.stopPropagation()">'+
+    '<div class="api-title">AI Image Generator</div>'+
+    '<div class="api-sub">Choose which AI powers your renders, AR try-on, and design sketches. Both options are supported.</div>'+
+    '<div class="api-provider-tabs">'+
+      '<button class="api-pt'+(AI.provider==='puter'?' active':'')+'" id="pt-puter" onclick="setProvider(\'puter\')">Puter.js (free)</button>'+
+      '<button class="api-pt'+(AI.provider==='openai'?' active':'')+'" id="pt-oai" onclick="setProvider(\'openai\')">ChatGPT / DALL-E</button>'+
+    '</div>'+
+    '<div id="puter-pane" style="display:'+(AI.provider==='puter'?'block':'none')+'">'+
+      '<div style="background:rgba(199,164,91,.07);border:1px solid rgba(199,164,91,.2);padding:1rem;font-size:.8rem;color:var(--sepia);font-weight:300;line-height:1.7">'+
+        'Puter.js routes generation through Gemini Imagen.<br>No API key required &mdash; users pay their own Puter credits.<br>Free for you as the developer.'+
+      '</div>'+
+    '</div>'+
+    '<div id="oai-pane" style="display:'+(AI.provider==='openai'?'block':'none')+'">'+
+      '<input class="api-input" id="oai-key-input" placeholder="sk-..." value="'+AI.openaiKey.replace(/./g,'•').slice(0,32)+'">'+
+      '<div class="api-note">Your key is stored only in your browser (localStorage). It is never sent to any server other than api.openai.com.<br>Used model: <strong>gpt-image-1</strong> (DALL-E 3 quality, ChatGPT API).</div>'+
+      '<div style="margin-top:.8rem;font-size:.75rem;color:var(--muted)">Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--brass-d)">platform.openai.com/api-keys</a></div>'+
+    '</div>'+
+    '<div class="api-actions">'+
+      '<button class="btn-p" onclick="saveAPIKey()">Save &amp; close</button>'+
+      '<button class="btn-g" onclick="closeAPIModal()">Cancel</button>'+
+      '<button class="btn-g" style="margin-left:auto;color:var(--muted);font-size:.55rem;border-color:transparent" onclick="clearAPIKey()">Clear key</button>'+
+    '</div>'+
+  '</div>';
+  document.getElementById('api-modal-root').innerHTML='<div class="api-modal" onclick="closeAPIModal()">'+html+'</div>';
+  // After rendering, attach real input listener so we don't keep showing dots
+  var inp=document.getElementById('oai-key-input');
+  if(inp){
+    inp.addEventListener('focus',function(){if(this.value&&this.value.includes('•'))this.value='';});
+  }
+}
+
+function setProvider(p){
+  AI.provider=p;
+  document.getElementById('pt-puter').classList.toggle('active',p==='puter');
+  document.getElementById('pt-oai').classList.toggle('active',p==='openai');
+  document.getElementById('puter-pane').style.display=p==='puter'?'block':'none';
+  document.getElementById('oai-pane').style.display=p==='openai'?'block':'none';
+}
+
+function saveAPIKey(){
+  var inp=document.getElementById('oai-key-input');
+  if(inp&&inp.value&&!inp.value.includes('•')){AI.openaiKey=inp.value.trim();}
+  localStorage.setItem('sintra_provider',AI.provider);
+  localStorage.setItem('sintra_openai_key',AI.openaiKey);
+  closeAPIModal();updateAPIStatus();
+  toast(AI.provider==='openai'&&AI.openaiKey?'ChatGPT connected':'Puter.js active');
+}
+function clearAPIKey(){AI.openaiKey='';localStorage.removeItem('sintra_openai_key');closeAPIModal();updateAPIStatus();toast('API key cleared');}
+function closeAPIModal(){document.getElementById('api-modal-root').innerHTML='';}
+
+// ═══ IMAGE GENERATION — dual provider ═══
+async function genImg(prompt,style){
+  var full='Fine jewelry photography: '+prompt+(style?'. '+style:'')+'. No text, no people, no watermarks.';
+  if(AI.provider==='openai'&&AI.openaiKey){
+    return await genImgOpenAI(full);
+  }
+  // fallback: Puter.js
+  try{
+    var imgEl=await puter.ai.txt2img(full,{model:'gemini-2.5-flash-image-preview'});
+    return(imgEl&&imgEl.src)?imgEl.src:null;
+  }catch(e){console.warn('Puter failed:',e);return null;}
+}
+
+async function genImgOpenAI(prompt){
+  try{
+    var r=await fetch('https://api.openai.com/v1/images/generations',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+AI.openaiKey},
+      body:JSON.stringify({model:'dall-e-3',prompt:prompt,n:1,size:'1024x1024',quality:'standard',response_format:'url'})
+    });
+    if(!r.ok){var e=await r.json();console.warn('OpenAI error:',e);return null;}
+    var d=await r.json();
+    return d.data&&d.data[0]&&d.data[0].url?d.data[0].url:null;
+  }catch(e){console.warn('OpenAI fetch failed:',e);return null;}
+}
+
+async function genImgEdit(prompt,base64,mime){
+  // Image editing only via Puter.js (OpenAI img2img requires different flow)
+  try{
+    var imgEl=await puter.ai.txt2img(prompt,{model:'gemini-2.5-flash-image-preview',input_image:base64,input_image_mime_type:mime||'image/jpeg'});
+    return(imgEl&&imgEl.src)?imgEl.src:null;
+  }catch(e){console.warn('Puter img2img failed:',e);return null;}
+}
+
+// ═══ APP STATE ═══
 var S={
   zone:'z0',model:'ring',modelIcon:'&#128141;',modelName:'Ring',
   vibeRow:0,vibeSelections:{},
@@ -583,7 +650,6 @@ var S={
   mainRender:null,history:[]
 };
 
-// ═══════════ MODEL DATA ═══════════
 var MODELS=[
   {id:'ring',icon:'&#128141;',label:'Ring',sub:'Solitaire · Band · Signet'},
   {id:'earring',icon:'&#127777;',label:'Earring',sub:'Stud · Drop · Hoop'},
@@ -593,179 +659,113 @@ var MODELS=[
   {id:'hairpin',icon:'&#12316;',label:'Hair pin',sub:'Barrette · Fork · Bobby'}
 ];
 
-// ═══════════ VIBE DATA — static Unsplash images, no AI ═══════════
-// All 6 pairs: each has a photo for left and right card
+// ═══ VIBE DATA — atmospheric Unsplash images ═══
 var VIBES=[
   {a:{name:'Classic',sub:'Timeless',desc:'Enduring forms, refined tradition',
-      img:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=700&q=80'},
+      img:'https://images.unsplash.com/photo-1490750967868-88df5691cc27?w=700&q=85'},
    b:{name:'Contemporary',sub:'Avant-garde',desc:'Unexpected shapes, pushing boundaries',
-      img:'https://images.unsplash.com/photo-1601821765780-754fa98637c1?w=700&q=80'}},
+      img:'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=700&q=85'}},
   {a:{name:'Soft',sub:'Delicate',desc:'Gossamer weight, whisper presence',
-      img:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=700&q=80'},
+      img:'https://images.unsplash.com/photo-1487530811015-780780169993?w=700&q=85'},
    b:{name:'Bold',sub:'Sculptural',desc:'Commanding shapes, visual weight',
-      img:'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=700&q=80'}},
+      img:'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=700&q=85'}},
   {a:{name:'Organic',sub:'Flowing',desc:'Nature-inspired, asymmetric beauty',
-      img:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=700&q=80'},
+      img:'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=700&q=85'},
    b:{name:'Geometric',sub:'Structured',desc:'Precise angles, mathematical elegance',
-      img:'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=700&q=80'}},
+      img:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=700&q=85'}},
   {a:{name:'Warm',sub:'Intimate',desc:'Personal warmth, golden touch',
-      img:'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=700&q=80'},
+      img:'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=700&q=85'},
    b:{name:'Cool',sub:'Minimalist',desc:'Cool clarity, architectural restraint',
-      img:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=700&q=80'}},
+      img:'https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=700&q=85'}},
   {a:{name:'Playful',sub:'Whimsical',desc:'Joyful movement, unexpected charm',
-      img:'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=700&q=80'},
+      img:'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=700&q=85'},
    b:{name:'Refined',sub:'Elegant',desc:'Disciplined form, restrained beauty',
-      img:'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=700&q=80'}},
+      img:'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=700&q=85'}},
   {a:{name:'Earth',sub:'Raw',desc:'Honest material, raw surface',
-      img:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=700&q=80'},
+      img:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=700&q=85'},
    b:{name:'Air',sub:'Polished',desc:'Refined finish, ethereal lightness',
-      img:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=700&q=80'}}
+      img:'https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=700&q=85'}}
 ];
 
-// ═══════════ MOOD BOARD DATA — static Pinterest-style images per parameter×value ═══════════
-// 6 parameters × 5 values = 30 curated images. Pure visual, no labels shown.
+// ═══ MOODBOARD — non-jewelry CMF/aesthetic images per parameter×value ═══
+// Flowers, marble, fabric, architecture, texture, nature — NO jewelry
 var MB_OPTS={
   complexity:{opts:['Minimal','Simple','Ornate','Intricate','Filigree'],
     imgs:{
-      Minimal:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=82',
-      Simple:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=400&q=82',
-      Ornate:'https://images.unsplash.com/photo-1615655406736-b37887a35122?w=400&q=82',
-      Intricate:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=82',
-      Filigree:'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=400&q=82'
+      Minimal:   'https://images.unsplash.com/photo-1516617442634-75371039cb3a?w=500&q=88',
+      Simple:    'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=500&q=88',
+      Ornate:    'https://images.unsplash.com/photo-1490750967868-88df5691cc27?w=500&q=88',
+      Intricate: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=500&q=88',
+      Filigree:  'https://images.unsplash.com/photo-1487530811015-780780169993?w=500&q=88'
     }},
   finish:{opts:['Matte','Brushed','Polished','Hammered','Patina'],
     imgs:{
-      Matte:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=82',
-      Brushed:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=82',
-      Polished:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=82',
-      Hammered:'https://images.unsplash.com/photo-1601821765780-754fa98637c1?w=400&q=82',
-      Patina:'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=400&q=82'
+      Matte:    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=88',
+      Brushed:  'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=500&q=88',
+      Polished: 'https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=500&q=88',
+      Hammered: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=500&q=88',
+      Patina:   'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=500&q=88'
     }},
   texture:{opts:['Smooth','Faceted','Engraved','Granulated','Woven'],
     imgs:{
-      Smooth:'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&q=82',
-      Faceted:'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=400&q=82',
-      Engraved:'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=400&q=82',
-      Granulated:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=82',
-      Woven:'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=400&q=82'
+      Smooth:    'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=500&q=88',
+      Faceted:   'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=500&q=88',
+      Engraved:  'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=500&q=88',
+      Granulated:'https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=500&q=88',
+      Woven:     'https://images.unsplash.com/photo-1474631245212-32dc3c8310c6?w=500&q=88'
     }},
   metal:{opts:['Silver','Gold','Rose Gold','Platinum','Two-tone'],
     imgs:{
-      Silver:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=400&q=82',
-      Gold:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=82',
-      'Rose Gold':'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=82',
-      Platinum:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=82',
-      'Two-tone':'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=400&q=82'
+      Silver:      'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=500&q=88',
+      Gold:        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=88',
+      'Rose Gold': 'https://images.unsplash.com/photo-1490750967868-88df5691cc27?w=500&q=88',
+      Platinum:    'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=500&q=88',
+      'Two-tone':  'https://images.unsplash.com/photo-1516617442634-75371039cb3a?w=500&q=88'
     }},
   volume:{opts:['Delicate','Standard','Statement','Layered','Oversized'],
     imgs:{
-      Delicate:'https://images.unsplash.com/photo-1601821765780-754fa98637c1?w=400&q=82',
-      Standard:'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=400&q=82',
-      Statement:'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=400&q=82',
-      Layered:'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=400&q=82',
-      Oversized:'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=400&q=82'
+      Delicate:   'https://images.unsplash.com/photo-1487530811015-780780169993?w=500&q=88',
+      Standard:   'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=500&q=88',
+      Statement:  'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=500&q=88',
+      Layered:    'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=500&q=88',
+      Oversized:  'https://images.unsplash.com/photo-1448375240586-882707db888b?w=500&q=88'
     }},
   edge:{opts:['Rounded','Sharp','Scalloped','Organic','Raw'],
     imgs:{
-      Rounded:'https://images.unsplash.com/photo-1615655406736-b37887a35122?w=400&q=82',
-      Sharp:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=400&q=82',
-      Scalloped:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=82',
-      Organic:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=82',
-      Raw:'https://images.unsplash.com/photo-1601821765780-754fa98637c1?w=400&q=82'
+      Rounded:   'https://images.unsplash.com/photo-1530789253388-582c481c54b0?w=500&q=88',
+      Sharp:     'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=500&q=88',
+      Scalloped: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=500&q=88',
+      Organic:   'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=500&q=88',
+      Raw:       'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=500&q=88'
     }}
 };
 
-// ═══════════ GALLERY DATA — natural/candid user-feel photos, matched by type ═══════════
-// Ring photos: hands with rings (candid, natural light)
-// Necklace photos: people wearing necklaces
-// Earring photos: people wearing earrings
-// Bracelet photos: wrist/arm shots
+// ═══ GALLERY DATA ═══
 var GALLERY=[
-  // RINGS — hand/finger shots
-  {type:'Ring',
-   photo:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=85',
-   review:'"Exactly the mood I had in my head &mdash; translated perfectly."',
-   user:'@maya_makes'},
-  {type:'Ring',
-   photo:'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600&q=85',
-   review:'"Wore it to my sister&rsquo;s wedding. Couldn&rsquo;t be happier."',
-   user:'@lena.wears'},
-  {type:'Ring',
-   photo:'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=600&q=85',
-   review:'"People kept asking where I got it. Zero studio, all Au&middot;lieu."',
-   user:'@dasha_b'},
-  // NECKLACES — worn on neck/collarbone
-  {type:'Necklace',
-   photo:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=600&q=85',
-   review:'"The AI render was so close to the final piece."',
-   user:'@j.mercado'},
-  {type:'Necklace',
-   photo:'https://images.unsplash.com/photo-1601821765780-754fa98637c1?w=600&q=85',
-   review:'"Understated and stunning. Exactly what I wanted."',
-   user:'@annaV'},
-  {type:'Necklace',
-   photo:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=85',
-   review:'"Got it as a gift for myself. Best decision this year."',
-   user:'@clem.rue'},
-  // EARRINGS — close portraits, ear detail
-  {type:'Earring',
-   photo:'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600&q=85',
-   review:'"Delicate, just as I imagined. Worth every step."',
-   user:'@sofias_world'},
-  {type:'Earring',
-   photo:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=85',
-   review:'"Exactly what I envisioned &mdash; a perfect gift."',
-   user:'@thea.k'},
-  {type:'Earring',
-   photo:'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=600&q=85',
-   review:'"Clean lines, extraordinary craft. Got so many comments."',
-   user:'@birthe_s'},
-  // BRACELETS — wrist shots
-  {type:'Bracelet',
-   photo:'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=600&q=85',
-   review:'"Bold and wearable &mdash; rare combination."',
-   user:'@rio.design'},
-  {type:'Bracelet',
-   photo:'https://images.unsplash.com/photo-1615655406736-b37887a35122?w=600&q=85',
-   review:'"Raw and beautiful &mdash; the imperfections are the point."',
-   user:'@matias_f'},
-  {type:'Bracelet',
-   photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=85',
-   review:'"Wore it on the first date. He noticed immediately."',
-   user:'@nora.oslo'}
+  {type:'Ring',photo:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=85',review:'"Exactly the mood I had in my head."',user:'@maya_makes'},
+  {type:'Ring',photo:'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600&q=85',review:'"Wore it to my sister\'s wedding. Couldn\'t be happier."',user:'@lena.wears'},
+  {type:'Ring',photo:'https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=600&q=85',review:'"People kept asking where I got it."',user:'@dasha_b'},
+  {type:'Necklace',photo:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=600&q=85',review:'"The AI render was so close to the final piece."',user:'@j.mercado'},
+  {type:'Necklace',photo:'https://images.unsplash.com/photo-1601821765780-754fa98637c1?w=600&q=85',review:'"Understated and stunning."',user:'@annaV'},
+  {type:'Necklace',photo:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=85',review:'"Best decision this year."',user:'@clem.rue'},
+  {type:'Earring',photo:'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600&q=85',review:'"Delicate, just as I imagined."',user:'@sofias_world'},
+  {type:'Earring',photo:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=85',review:'"A perfect gift."',user:'@thea.k'},
+  {type:'Earring',photo:'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=600&q=85',review:'"Got so many comments."',user:'@birthe_s'},
+  {type:'Bracelet',photo:'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=600&q=85',review:'"Bold and wearable — rare combination."',user:'@rio.design'},
+  {type:'Bracelet',photo:'https://images.unsplash.com/photo-1615655406736-b37887a35122?w=600&q=85',review:'"The imperfections are the point."',user:'@matias_f'},
+  {type:'Bracelet',photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=85',review:'"He noticed immediately."',user:'@nora.oslo'}
 ];
-
-// TEASER: 3 candid photos for landing
 var TEASER=[
-  {photo:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=700&q=85',
-   type:'Ring',review:'"Exactly the mood I had in my head."',user:'@maya_makes'},
-  {photo:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=700&q=85',
-   type:'Necklace',review:'"The AI render was so close to the final piece."',user:'@j.mercado'},
-  {photo:'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=700&q=85',
-   type:'Earring',review:'"Delicate, just as I imagined."',user:'@sofias_world'}
+  {photo:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=700&q=85',type:'Ring',review:'"Exactly the mood I had in my head."',user:'@maya_makes'},
+  {photo:'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=700&q=85',type:'Necklace',review:'"The AI render was so close to the final piece."',user:'@j.mercado'},
+  {photo:'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=700&q=85',type:'Earring',review:'"Delicate, just as I imagined."',user:'@sofias_world'}
 ];
 
-// ═══════════ PUTER.JS — only for AI-generated parts (composition, AR, 3D render) ═══════════
-async function genImg(prompt,style){
-  var full='Fine jewelry photography: '+prompt+(style?'. '+style:'')+'. No text, no people, no watermarks.';
-  try{
-    var imgEl=await puter.ai.txt2img(full,{model:'gemini-2.5-flash-image-preview'});
-    return(imgEl&&imgEl.src)?imgEl.src:null;
-  }catch(e){console.warn('Puter gen failed:',e);return null;}
-}
-async function genImgEdit(prompt,base64,mime){
-  try{
-    var imgEl=await puter.ai.txt2img(prompt,{model:'gemini-2.5-flash-image-preview',input_image:base64,input_image_mime_type:mime||'image/jpeg'});
-    return(imgEl&&imgEl.src)?imgEl.src:null;
-  }catch(e){console.warn('Puter img2img failed:',e);return null;}
-}
-
-// ═══════════ NAVIGATION ═══════════
+// ═══ NAVIGATION ═══
 function goTo(z){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById(z).classList.add('active');
-  S.zone=z;window.scrollTo(0,0);
-  addHist(z);renderSB();
+  S.zone=z;window.scrollTo(0,0);addHist(z);renderSB();
   if(z==='z0')renderTeaser();
   if(z==='z1')renderModels();
   if(z==='z2'){S.vibeRow=0;renderVibes();}
@@ -776,7 +776,7 @@ function goTo(z){
   if(z==='z8')renderSet();
   if(z==='z9')updateCO();
   if(z==='z10')renderGallery();
-  if(z==='z8'){var ns=['Warm Geometric Study','Organic Whisper','Cool Edge Series','Raw Earth Tones','Soft Solstice'];document.getElementById('mb-name').textContent=ns[Math.floor(Math.random()*ns.length)];}
+  if(z==='z8'){var ns=['Warm Geometric Study','Organic Whisper','Cool Edge','Raw Earth Tones','Soft Solstice'];document.getElementById('mb-name').textContent=ns[Math.floor(Math.random()*ns.length)];}
 }
 function addHist(z){
   var L={z0:'Landing',z1:'Model',z2:'Vibe',z3:'Mood board',z4:'Manual',z5:'Composition',z6:'AI Render',z7:'Try-on',z8:'Set builder',z9:'Checkout',z10:'Gallery'};
@@ -792,24 +792,22 @@ function renderSB(){
   if(sp)sp.innerHTML=Object.values(S.mb).map(function(m){return'<div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.28rem"><span style="color:var(--muted)">'+m.label+'</span><span style="color:var(--charcoal)">'+m.value+'</span></div>';}).join('');
 }
 
-// ═══════════ Z0 TEASER ═══════════
+// ═══ Z0 TEASER ═══
 function renderTeaser(){
   var g=document.getElementById('teaser-grid');if(!g)return;
   g.innerHTML=TEASER.map(function(t){
-    return'<div class="gc" onclick="goTo(\'z10\')" style="cursor:pointer;position:relative;transition:transform .4s">'+
-      '<div style="aspect-ratio:4/3;overflow:hidden;background:var(--charcoal)"><img src="'+t.photo+'" style="width:100%;height:100%;object-fit:cover;transition:transform .6s" loading="lazy"></div>'+
-      '<div class="gc-info"><div class="gc-vibe">'+t.type+' &middot; '+t.user+'</div><div class="gc-review">'+t.review+'</div></div>'+
-      '<button class="gc-use" onclick="event.stopPropagation();loadBoard()">Use this board</button></div>';
+    return'<div style="cursor:pointer;position:relative;transition:transform .4s" onclick="goTo(\'z10\')" onmouseenter="this.style.transform=\'translateY(-5px)\'" onmouseleave="this.style.transform=\'\'">'+
+      '<div style="aspect-ratio:4/3;overflow:hidden;background:var(--charcoal)"><img src="'+t.photo+'" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>'+
+      '<div class="gc-info"><div class="gc-vibe">'+t.type+' &middot; '+t.user+'</div><div class="gc-review">'+t.review+'</div></div></div>';
   }).join('');
 }
 
-// ═══════════ Z1 MODELS ═══════════
+// ═══ Z1 MODELS ═══
 function renderModels(){
   var g=document.getElementById('models-grid');if(!g)return;
   g.innerHTML=MODELS.map(function(m){
     return'<div class="mc" onclick="selModel(\''+m.id+'\',\''+m.icon+'\',\''+m.label+'\')"><div class="mc-img"><span class="mc-ph">'+m.icon+'</span></div><div class="mc-lbl">'+m.label+'</div><div class="mc-sub">'+m.sub+'</div></div>';
   }).join('');
-  // Only sketches are AI-generated in this zone
   MODELS.forEach(function(m,i){
     var card=g.querySelectorAll('.mc')[i];var imgW=card.querySelector('.mc-img');
     genImg('Minimalist pencil charcoal sketch of a '+m.label+' jewelry piece single centered object on cream paper','pencil sketch illustration no color').then(function(src){
@@ -826,7 +824,7 @@ function selModel(id,icon,label){
   '</div>');
 }
 
-// ═══════════ Z2 VIBES — static images, auto-advance on click ═══════════
+// ═══ Z2 VIBES — static images, auto-advance ═══
 function renderVibes(){
   var c=document.getElementById('vibe-content');if(!c)return;
   var row=S.vibeRow,pair=VIBES[row];
@@ -834,8 +832,7 @@ function renderVibes(){
   c.innerHTML='<div class="vibe-wrap">'+
     '<div class="vibe-step-lbl">Pair '+(row+1)+' of '+VIBES.length+' &mdash; tap to choose, we move on automatically</div>'+
     '<div class="vibe-grid">'+buildVC(pair.a,0,row)+buildVC(pair.b,1,row)+'</div>'+
-  '</div>'+
-  '<div class="vibe-dots">'+dots+'</div>'+
+  '</div><div class="vibe-dots">'+dots+'</div>'+
   '<div class="vibe-skip"><button class="btn-g" onclick="skipToMB()">Skip &mdash; show my mood board</button><button class="btn-g" onclick="goTo(\'z4\')">Manual control</button></div>';
 }
 function buildVC(v,side,row){
@@ -867,20 +864,18 @@ function assignVibeParams(){
   for(var i=0;i<VIBES.length;i++){var sel=S.vibeSelections[i]||0;var p=maps[i][sel];if(p)keys.forEach(function(k,j){if(p[j])S.mb[k].value=p[j];});}
 }
 
-// ═══════════ Z3 MOODBOARD — static images, no labels, Pinterest style ═══════════
+// ═══ Z3 MOODBOARD — pure image grid, absolutely no text labels ═══
 function renderMB(){
   var g=document.getElementById('mb-grid');if(!g)return;
   g.innerHTML=Object.keys(S.mb).map(function(k){
     var m=S.mb[k];var imgs=MB_OPTS[k].imgs;var src=imgs[m.value]||Object.values(imgs)[0];
-    return'<div class="mbc" onclick="openLB(\''+k+'\')">'+
-      '<div class="mbc-img"><img src="'+src+'" alt="" loading="lazy">'+
-        '<div class="mbc-hover"><div class="mbc-hover-txt">'+m.label+'<br>'+m.value+' &rarr; tap to change</div></div>'+
-      '</div></div>';
+    // NO text labels anywhere — just the image, clickable to open picker
+    return'<div class="mbc" onclick="openLB(\''+k+'\')"><img src="'+src+'" alt="" loading="lazy"></div>';
   }).join('');
 }
 function saveTpl(){var n=prompt('Name this mood board:','My Mood Board')||'Untitled';toast('Saved: "'+n+'"');}
 
-// ═══════════ Z4 MANUAL ═══════════
+// ═══ Z4 MANUAL ═══
 function renderManual(){
   var c=document.getElementById('manual-params');if(!c)return;
   c.innerHTML=Object.keys(MB_OPTS).map(function(k){
@@ -898,14 +893,13 @@ function setMan(k,v,btn){
 async function genPreview(){
   var box=document.getElementById('prev-box');if(!box)return;
   var ov=document.createElement('div');ov.className='gen-overlay';
-  ov.innerHTML='<div class="spin"></div><div class="gen-text">Generating&hellip;</div>';
-  box.appendChild(ov);
+  ov.innerHTML='<div class="spin"></div><div class="gen-text">Generating&hellip;</div>';box.appendChild(ov);
   var src=await genImg(buildRP(),'luxury product photography dark background');
   if(ov.parentNode)ov.parentNode.removeChild(ov);
   if(src){var old=box.querySelector('img');if(old)old.remove();var ph=box.querySelector('.prev-ph');if(ph)ph.style.display='none';var el=document.createElement('img');el.src=src;box.appendChild(el);}
 }
 
-// ═══════════ Z6 AI RENDER (AI-generated) ═══════════
+// ═══ Z6 AI RENDER ═══
 function buildRP(){
   var m=S.mb;
   return S.modelName+' jewelry '+m.metal.value+' metal '+m.complexity.value+' complexity '+m.finish.value+' finish '+m.texture.value+' texture '+m.volume.value+' volume '+m.edge.value+' edges mastercraft fine jewelry product shot';
@@ -929,13 +923,13 @@ async function genMainRender(){
     S.mainRender=src;var old=area.querySelector('img.main');if(old)old.remove();
     var el=document.createElement('img');el.className='main';el.src=src;area.appendChild(el);
     if(corner)corner.style.display='block';genVars();
-  }else{if(ph)ph.style.display='flex';}
+  }else{if(ph){ph.style.display='flex';ph.querySelector&&(ph.querySelector('.render-ph-t').textContent='Generation failed — check your AI connection');}}
 }
 async function genVars(){
   var vg=document.getElementById('vars-grid');if(!vg)return;
   vg.innerHTML='<div style="grid-column:1/-1;font-family:var(--mono);font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Generating variations&hellip;</div>';
-  var styles=['white studio background clean minimal','dark dramatic moody lighting','warm golden bokeh background'];
-  var results=await Promise.all(styles.map(function(st){return genImg(buildRP(),st+' luxury jewelry photography');}));
+  var styles=['white studio background clean minimal','dark dramatic moody lighting','warm golden bokeh'];
+  var results=await Promise.all(styles.map(function(st){return genImg(buildRP(),st+' jewelry photography');}));
   vg.innerHTML='';
   results.forEach(function(src){
     var div=document.createElement('div');div.className='var-thumb';
@@ -951,10 +945,10 @@ async function genVars(){
   });
 }
 
-// ═══════════ Z7 AR TRY-ON (AI image-to-image) ═══════════
+// ═══ Z7 AR ═══
 function resetAR(){
   var res=document.getElementById('ar-result');
-  if(res)res.innerHTML='<div class="ar-result-ph"><span class="ar-result-ph-icon">&#128141;</span><div class="ar-result-ph-t">Upload a hand photo to see your ring on your finger</div></div>';
+  if(res)res.innerHTML='<div class="ar-result-ph"><span class="ar-result-ph-icon">&#128141;</span><div class="ar-result-ph-t">Upload a hand photo to try on your ring</div></div>';
   var st=document.getElementById('ar-status');if(st)st.textContent='';
 }
 function switchAR(tab){
@@ -972,12 +966,11 @@ function handleFingerUpload(evt){
     res.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:contain;opacity:.6"><div class="gen-overlay" id="ar-gen-ov"><div class="spin" style="width:32px;height:32px;border-width:3px"></div><div class="gen-text">AI placing ring on your finger&hellip;</div></div>';
     var st=document.getElementById('ar-status');if(st)st.textContent='Analysing your hand photo&hellip;';
     placeRing(base64,mime,dataUrl);
-  };
-  reader.readAsDataURL(file);
+  };reader.readAsDataURL(file);
 }
 async function placeRing(base64,mime,orig){
-  var desc='a beautiful '+S.mb.metal.value+' '+S.modelName.toLowerCase()+' with '+S.mb.complexity.value.toLowerCase()+' design '+S.mb.finish.value.toLowerCase()+' finish '+S.mb.texture.value.toLowerCase()+' texture';
-  var prompt='Place '+desc+' naturally on the ring finger of this hand. Keep the hand skin tone lighting and background exactly the same. Only add the ring. The ring should look real with accurate reflections and shadows matching the existing light. Do not change anything else.';
+  var desc='a beautiful '+S.mb.metal.value+' '+S.modelName.toLowerCase()+' with '+S.mb.complexity.value.toLowerCase()+' design '+S.mb.finish.value.toLowerCase()+' finish';
+  var prompt='Place '+desc+' naturally on the ring finger of this hand. Keep the hand skin tone lighting and background exactly the same. Only add the ring. Make it look photorealistic. Do not change anything else.';
   var src=await genImgEdit(prompt,base64,mime);
   var ov=document.getElementById('ar-gen-ov');if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);
   var st=document.getElementById('ar-status');var res=document.getElementById('ar-result');
@@ -985,12 +978,12 @@ async function placeRing(base64,mime,orig){
     res.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain">';
     if(st)st.textContent='Ring placed by AI. Adjust design in step 5 if needed.';
   }else{
-    res.innerHTML='<img src="'+orig+'" style="width:100%;height:100%;object-fit:contain;opacity:.5"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.5rem;text-align:center"><div style="background:rgba(44,44,44,.8);padding:1rem 1.5rem;color:var(--paper);font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;line-height:1.8">Could not place ring via Puter.js<br>Try the dimensions tab instead</div></div>';
-    if(st)st.textContent='AI placement unavailable. Please try again or use dimensions tab.';
+    res.innerHTML='<img src="'+orig+'" style="width:100%;height:100%;object-fit:contain;opacity:.5"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1.5rem;text-align:center"><div style="background:rgba(44,44,44,.82);padding:1rem 1.5rem;color:var(--paper);font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;line-height:1.9">AI unavailable right now<br>Use dimensions tab instead</div></div>';
+    if(st)st.textContent='AI try-on unavailable. Use the dimensions tab.';
   }
 }
 
-// ═══════════ Z8 SET BUILDER (AI-generates companion pieces) ═══════════
+// ═══ Z8 SET ═══
 function renderSet(){
   var ic=document.getElementById('set-cur-icon');if(ic)ic.innerHTML=S.modelIcon;
   var nm=document.getElementById('set-cur-name');if(nm)nm.textContent=S.modelName;
@@ -1013,7 +1006,7 @@ function renderSet(){
 }
 function addSet(btn){btn.textContent='&#10003; Added';btn.style.background='var(--brass)';btn.style.color='var(--paper)';toast('Added to your set');}
 
-// ═══════════ Z9 CHECKOUT ═══════════
+// ═══ Z9 CHECKOUT ═══
 function updateCO(){
   var ic=document.getElementById('co-thumb-icon');if(ic)ic.innerHTML=S.modelIcon;
   var nm=document.getElementById('co-name');if(nm)nm.textContent='Custom '+S.modelName;
@@ -1027,7 +1020,7 @@ function placeOrder(){
     '<button class="btn-p" onclick="closeModal();goTo(\'z10\')">Explore the gallery</button></div>');
 }
 
-// ═══════════ Z10 GALLERY — type-matched real photos ═══════════
+// ═══ Z10 GALLERY ═══
 function renderGallery(){
   var ff=document.getElementById('gal-filters');var gg=document.getElementById('gal-grid');if(!ff||!gg)return;
   var cats=['All','Ring','Necklace','Earring','Bracelet'];
@@ -1041,46 +1034,39 @@ function filterGal(btn,val){
 function renderGalGrid(data){
   var gg=document.getElementById('gal-grid');if(!gg)return;
   gg.innerHTML=data.map(function(g){
-    return'<div class="gc-user">'+
+    return'<div class="gc-user" onmouseenter="this.querySelector(\'.gc-use\').style.opacity=\'1\'" onmouseleave="this.querySelector(\'.gc-use\').style.opacity=\'0\'">'+
       '<div class="gc-user-photo"><img src="'+g.photo+'" alt="'+g.type+'" loading="lazy"></div>'+
       '<div class="gc-user-info"><div class="gc-user-type">'+g.type+' &middot; '+g.user+'</div><div class="gc-user-review">'+g.review+'</div></div>'+
       '<button class="gc-use" onclick="loadBoard()" style="position:absolute;top:.6rem;right:.6rem;background:var(--charcoal);color:var(--paper);padding:.3rem .6rem;font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:opacity .2s;border:none;cursor:pointer">Use this board</button>'+
     '</div>';
   }).join('');
-  // Add hover to show/hide use button
-  document.querySelectorAll('.gc-user').forEach(function(c){
-    var btn=c.querySelector('.gc-use');
-    c.addEventListener('mouseenter',function(){btn.style.opacity='1';});
-    c.addEventListener('mouseleave',function(){btn.style.opacity='0';});
-  });
 }
 function loadBoard(){assignVibeParams();goTo('z3');toast('Mood board loaded');}
 
-// ═══════════ LIGHTBOX — for parameter editing on moodboard ═══════════
+// ═══ LIGHTBOX ═══
 function openLB(key){
   if(key==='all'){
     var html='<div class="lb-box" onclick="event.stopPropagation()"><button class="mb-x" onclick="closeLB()">&#10005;</button>'+
-      '<div style="font-family:var(--serif);font-size:1.25rem;font-weight:300;color:var(--charcoal);margin-bottom:.2rem">Edit all parameters</div>'+
-      '<div style="font-size:.8rem;color:var(--sepia);font-weight:300;margin-bottom:1.1rem">Adjust any value then regenerate your render.</div>'+
+      '<div style="font-family:var(--serif);font-size:1.25rem;font-weight:300;color:var(--charcoal);margin-bottom:1.1rem">Edit all parameters</div>'+
       Object.keys(MB_OPTS).map(function(k){
         return'<div class="pb"><div class="pl">'+S.mb[k].label+'</div><div class="po">'+
           MB_OPTS[k].opts.map(function(o){return'<button class="pob'+(S.mb[k].value===o?' sel':'')+'" onclick="setMan(\''+k+'\',\''+o+'\',this)">'+o+'</button>';}).join('')+
         '</div></div>';
       }).join('')+
-      '<div style="display:flex;gap:.6rem;margin-top:.75rem"><button class="btn-p" onclick="closeLB();genMainRender()">Regenerate render &rarr;</button><button class="btn-g" onclick="closeLB()">Close</button></div></div>';
+      '<div class="lb-actions"><button class="btn-p" onclick="closeLB();genMainRender()">Regenerate render &rarr;</button><button class="btn-g" onclick="closeLB()">Close</button></div></div>';
     document.getElementById('lb-root').innerHTML='<div class="lb-ov" onclick="closeLB()">'+html+'</div>';return;
   }
   var m=S.mb[key];window._lbKey=key;window._lbVal=m.value;
   var opts=MB_OPTS[key].opts;var imgs=MB_OPTS[key].imgs;
   var html='<div class="lb-box" onclick="event.stopPropagation()"><button class="mb-x" onclick="closeLB()">&#10005;</button>'+
-    '<div style="font-family:var(--mono);font-size:.57rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem">'+m.label+'</div>'+
-    '<div style="font-family:var(--serif);font-size:1.25rem;font-weight:300;color:var(--charcoal);margin-bottom:.6rem">Choose a direction</div>'+
+    '<div style="font-family:var(--mono);font-size:.57rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem">'+m.label+'</div>'+
+    '<div style="font-family:var(--serif);font-size:1.25rem;font-weight:300;color:var(--charcoal);margin-bottom:.7rem">Choose a direction</div>'+
     '<div class="lb-grid">'+
       opts.map(function(o){
         var src=imgs[o]||'';
         return'<div><div class="lb-img-wrap'+(o===m.value?' sel':'')+'" onclick="selLB(\''+key+'\',\''+o+'\',this)">'+
           (src?'<img src="'+src+'" loading="lazy">':'')+
-        '</div><div class="lb-img-lbl">'+o+'</div></div>';
+        '</div><div style="font-family:var(--mono);font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.3rem;text-align:center">'+o+'</div></div>';
       }).join('')+
     '</div><div class="lb-actions"><button class="btn-p" onclick="applyLB()">Apply</button><button class="btn-g" onclick="closeLB()">Cancel</button></div></div>';
   document.getElementById('lb-root').innerHTML='<div class="lb-ov" onclick="closeLB()">'+html+'</div>';
@@ -1091,14 +1077,12 @@ function selLB(key,val,el){
 }
 function applyLB(){
   if(window._lbKey&&window._lbVal){S.mb[window._lbKey].value=window._lbVal;}
-  closeLB();
-  if(S.zone==='z3')renderMB();
-  if(S.zone==='z6'){renderParamsPanel();genMainRender();}
-  toast('Parameter updated');
+  closeLB();if(S.zone==='z3')renderMB();if(S.zone==='z6'){renderParamsPanel();genMainRender();}
+  toast('Updated');
 }
 function closeLB(){document.getElementById('lb-root').innerHTML='';}
 
-// ═══════════ MODAL ═══════════
+// ═══ MODAL ═══
 function showModal(html){
   document.getElementById('modal-root').innerHTML='<div class="mo" onclick="if(event.target===this)closeModal()"><div class="mb-box"><button class="mb-x" onclick="closeModal()">&#10005;</button>'+html+'</div></div>';
 }
@@ -1106,7 +1090,11 @@ function closeModal(){document.getElementById('modal-root').innerHTML='';}
 function selPO(btn){btn.closest('.po').querySelectorAll('.pob').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');}
 function toast(msg){var t=document.createElement('div');t.className='toast';t.textContent=msg;document.getElementById('toast-root').appendChild(t);setTimeout(function(){t.remove();},3200);}
 
+// ═══ INIT ═══
+updateAPIStatus();
 renderTeaser();
 </script>
 </body>
 </html>
+ENDHTML
+echo "Done: $(wc -l < /mnt/user-data/outputs/index.html) lines"
